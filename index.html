@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCNA 核心單字卡 100 張 (含發音功能)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            color: #1a365d;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        select, button {
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background-color: #e2e8f0;
+        }
+        button.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        .card-container {
+            width: 100%;
+            max-width: 500px;
+            height: 320px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 16px;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            border-radius: 16px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+            background-color: #f8fafc;
+        }
+        .module-tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .star-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+        .star-btn.starred {
+            color: #f59e0b;
+        }
+        .term-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .term {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .audio-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.1s ease, background-color 0.2s;
+        }
+        .audio-btn:hover {
+            background-color: #e2e8f0;
+            transform: scale(1.1);
+        }
+        .audio-btn:active {
+            transform: scale(0.95);
+        }
+        .definition {
+            font-size: 16px;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 15px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .progress {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CCNA 核心單字卡</h1>
+
+    <div class="controls">
+        <select id="moduleSelect" onchange="filterCards()">
+            <option value="all">所有模組 (100 個單字)</option>
+            <option value="1">模組一：網路基礎與拓撲</option>
+            <option value="2">模組二：IP 位址與子網劃分</option>
+            <option value="3">模組三：路由與交換</option>
+            <option value="4">模組四：網路服務與協定</option>
+            <option value="5">模組五：安全性與存取控制</option>
+            <option value="6">模組六：自動化、管理與除錯</option>
+        </select>
+        <button id="starFilterBtn" onclick="toggleStarredOnly()">僅顯示收藏 (★)</button>
+        <button onclick="shuffleCards()">隨機洗牌 🔀</button>
+    </div>
+
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="card">
+            <div class="card-face card-front">
+                <span class="module-tag" id="cardModule">模組</span>
+                <button class="star-btn" id="starBtn" onclick="toggleStar(event)">★</button>
+                <div class="term-container">
+                    <div class="term" id="cardTerm">Bandwidth</div>
+                    <button class="audio-btn" title="朗讀英文" onclick="speakTerm(event)">🔊</button>
+                </div>
+                <div class="hint">點擊卡片翻面查看解釋</div>
+            </div>
+            <div class="card-face card-back">
+                <div class="definition" id="cardDef">解釋載入中...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button onclick="prevCard()">上一張 ⬅️</button>
+        <span class="progress" id="progress">1 / 100</span>
+        <button onclick="nextCard()">下一張 ➡️</button>
+    </div>
+
+    <script>
+        const rawData = [
+            // 模組一
+            { m: 1, term: "Bandwidth", def: "頻寬：網路鏈路最大可傳輸資料的容量（如 1 Gbps）。" },
+            { m: 1, term: "Throughput", def: "吞吐量：單位時間內實際成功傳送的資料量（受延遲與擁塞影響）。" },
+            { m: 1, term: "Latency", def: "延遲：封包從來源端到達目的地所需的時間。" },
+            { m: 1, term: "Jitter", def: "抖動：封包到達時間的不穩定性，對 VoIP 語音通話影響巨大。" },
+            { m: 1, term: "Topology", def: "拓撲：網路設備與線路的架構與連接型態。" },
+            { m: 1, term: "Star Topology", def: "星狀拓撲：所有節點皆連接至中央裝置（如 Switch）的架構。" },
+            { m: 1, term: "Mesh Topology", def: "網狀拓撲：設備間具備多條相互備援連接的架構。" },
+            { m: 1, term: "Redundancy", def: "冗餘/備援：提供備用鏈路或設備，防止單點故障 (Single Point of Failure)。" },
+            { m: 1, term: "Encapsulation", def: "封裝：資料由上層往下層傳輸時，逐層加上 Header/Trailer 的過程。" },
+            { m: 1, term: "Decapsulation", def: "解封裝：接收端將接收到的資料逐層拆開並讀取標頭資訊的過程。" },
+            { m: 1, term: "Payload", def: "有效負載：封包中去除 Header/Trailer 後實際要傳送的資料內容。" },
+            { m: 1, term: "Frame", def: "資料幀：OSI 第二層（資料鏈結層）的資料格式。" },
+            { m: 1, term: "Packet", def: "封包：OSI 第三層（網路層）的資料格式。" },
+            { m: 1, term: "Segment", def: "區段：OSI 第四層（傳輸層）的資料格式（如 TCP Segment）。" },
+            { m: 1, term: "Header", def: "表頭/標頭：放置控制資訊（如來源與目的 IP/MAC 位址）的欄位。" },
+            { m: 1, term: "Trailer", def: "頁尾/標尾：附在資料幀末端，通常包含 FCS 錯誤檢查碼。" },
+            { m: 1, term: "Duplex", def: "雙工模式：指資料傳輸的方向性（Full-duplex / Half-duplex）。" },
+            { m: 1, term: "Half-Duplex", def: "半雙工：同一時間只能單向傳輸（如使用 Hub 或舊式乙太網，需 CSMA/CD）。" },
+            { m: 1, term: "Full-Duplex", def: "全雙工：可同時進行雙向傳輸（如現代 Switch）。" },
+            { m: 1, term: "Attenuation", def: "訊號衰減：訊號在傳輸介質（雙絞線/光纖）中隨距離延伸而變弱的現象。" },
+            
+            // 模組二
+            { m: 2, term: "Subnet Mask", def: "子網路遮罩：用來區分 IP 位址中「網路號」與「主機號」的 32-bit 遮罩。" },
+            { m: 2, term: "CIDR", def: "無類別域間路由：如 /24，用斜線與數字表示遮罩長度的方式。" },
+            { m: 2, term: "Wildcard Mask", def: "萬用字元遮罩：ACL 與 OSPF 常用的反向遮罩（0 表示必須匹配，1 表示忽略）。" },
+            { m: 2, term: "Broadcast Address", def: "廣播位址：主機位元全為 1 的位址（如 192.168.1.255）。" },
+            { m: 2, term: "Network Address", def: "網路位址：主機位元全為 0 的位址，代表該子網本身（如 192.168.1.0）。" },
+            { m: 2, term: "Host", def: "主機/端點：指連接至網路並配有 IP 的終端設備。" },
+            { m: 2, term: "Loopback Address", def: "迴路位址：測試本機網路協定堆疊的位址（如 127.0.0.1 或路由器邏輯介面）。" },
+            { m: 2, term: "Default Gateway", def: "預設閘道：當設備欲傳送封包至其他子網時的預設出口路由器 IP。" },
+            { m: 2, term: "Unicast", def: "單播：一對一的通訊模式。" },
+            { m: 2, term: "Multicast", def: "多播/組播：一對指定的特定群組通訊（如 OSPF 用的 224.0.0.5）。" },
+            { m: 2, term: "Broadcast", def: "廣播：一對區域網路內所有設備的通訊（255.255.255.255）。" },
+            { m: 2, term: "Anycast", def: "任播：IPv6 特有，發送至距離最近的同位址群組介面。" },
+            { m: 2, term: "Prefix Length", def: "前綴長度：IP 位址中子網路遮罩連續為 1 的位元數。" },
+            { m: 2, term: "Summarization", def: "路由彙總：將多條連續的子網路由合併為一條較簡短的路由以節省路由表空間。" },
+            { m: 2, term: "Supernetting", def: "超網劃分：將多個 Class C 網路合併為一個大網路的技術。" },
+
+            // 模組三
+            { m: 3, term: "Convergence", def: "收斂：當拓撲發生變化時，所有路由器達成路由表一致狀態的過程與時間。" },
+            { m: 3, term: "Metric", def: "測度/度量值：動態路由協定用來判斷「最佳路徑」的計算數值（如 Cost, Cost=10^8/BW）。" },
+            { m: 3, term: "Administrative Distance", def: "管理距離：路由器評估「不同路由來源」可信度的依據（數字越小越可信）。" },
+            { m: 3, term: "Hop Count", def: "跳數：封包到達目的端所經過的路由器數量（如 RIP 限制 15 跳）。" },
+            { m: 3, term: "Next Hop", def: "下一跳：路由器將封包轉發出去後，下一個接收該封包的路由器 IP。" },
+            { m: 3, term: "Routing Table", def: "路由表：路由器核心資料庫，紀錄目標網路與相對應的轉發介面。" },
+            { m: 3, term: "Static Route", def: "靜態路由：由管理員手動設定的固定路由路徑。" },
+            { m: 3, term: "Dynamic Routing", def: "動態路由：利用 OSPF、EIGRP 等協定讓路由器自動學習與維護路徑。" },
+            { m: 3, term: "Default Route", def: "預設路由：匹配所有未知目標位址的路由項（0.0.0.0/0）。" },
+            { m: 3, term: "Flooding", def: "氾濫/洪泛：Switch 在收到未知的 Unicast 幀時，將其複製轉發至除了接收埠以外的所有埠。" },
+            { m: 3, term: "Forwarding", def: "轉發：交換機或路由器依據表單將封包/幀送往正確連接埠的行為。" },
+            { m: 3, term: "Frame Switching", def: "幀交換：交換機依據 MAC 地址表進行二層轉發的過程。" },
+            { m: 3, term: "MAC Address Table", def: "MAC 位址表：Switch 記錄「MAC 位址」與「Port 連接埠」對映關係的表格。" },
+            { m: 3, term: "Trunking", def: "中繼/Trunk：允許多個 VLAN 流量共用同一條實體鏈路傳送的技術（802.1Q）。" },
+            { m: 3, term: "Native VLAN", def: "原生 VLAN：802.1Q Trunk 鏈路上唯一「不打 VLAN Tag」的預設 VLAN。" },
+            { m: 3, term: "Tagging", def: "打標籤：在二層 Header 中寫入 VLAN ID（如 802.1Q 標頭）以識別所屬 VLAN。" },
+            { m: 3, term: "Spanning Tree Protocol", def: "生成樹協定：用來防止二層交換網路產生廣播風暴（Loop 迴路）的協定。" },
+            { m: 3, term: "Root Bridge", def: "根橋接器：STP 樹狀結構的邏輯核心交換機（BID 最小者勝出）。" },
+            { m: 3, term: "Designated Port", def: "指定埠：STP 中負責向該網段轉發流量的連接埠（處於 Forwarding 狀態）。" },
+            { m: 3, term: "Blocking State", def: "阻塞狀態：STP 連接埠不轉發資料幀以防迴路，但仍會接收 BPDU。" },
+            { m: 3, term: "Listening State", def: "傾聽狀態：STP 準備學習 MAC 位址與轉發前的過渡狀態。" },
+            { m: 3, term: "Learning State", def: "學習狀態：STP 開始建構 MAC 位址表但仍不轉發資料幀的狀態。" },
+            { m: 3, term: "Forwarding State", def: "轉發狀態：STP 連接埠正常接收與轉發資料幀的狀態。" },
+            { m: 3, term: "EtherChannel", def: "乙太通道：將多條實體網線綁定為單一邏輯高頻寬鏈路的技術（LACP/PaGP）。" },
+            { m: 3, term: "PortFast", def: "快速埠：Cisco 獨家技術，讓終端設備連接埠跳過 Listening/Learning 直接進入 Forwarding。" },
+
+            // 模組四
+            { m: 4, term: "Resolution", def: "解析：如 ARP（IP 解析為 MAC）或 DNS（域名解析為 IP）。" },
+            { m: 4, term: "Lease", def: "租約：DHCP 伺服器分配 IP 給客戶端使用的有效時間長度。" },
+            { m: 4, term: "Reservation", def: "預留：在 DHCP 伺服器中綁定特定 MAC 位址，使其每次都取得固定的 IP。" },
+            { m: 4, term: "Scope", def: "作用域：DHCP 伺服器可分配之 IP 位址範圍與相關參數組合。" },
+            { m: 4, term: "Translation", def: "轉譯：如 NAT 將私有 IP（Private IP）轉譯為公網 IP（Public IP）。" },
+            { m: 4, term: "Overload", def: "過載 (PAT)：使用 NAT 過載模式，讓多個內網 IP 共用單一公網 IP + Port 號。" },
+            { m: 4, term: "Keepalive", def: "保活訊號：設備間定期發送的小封包，用以確認鏈路或對端設備是否運作正常。" },
+            { m: 4, term: "Neighbor Discovery", def: "鄰居發現：如 IPv6 的 ND 協定（取代 ARP）或 CD/LLDP 鄰居發現。" },
+            { m: 4, term: "Adjacency", def: "鄰接關係：OSPF 路由器交換 Link-State 資訊前建立的深層鄰居關係。" },
+            { m: 4, term: "Handshake", def: "握手：如 TCP 建立連線的三向握手（Three-way Handshake: SYN, SYN-ACK, ACK）。" },
+            { m: 4, term: "Overhead", def: "額外開銷：除了傳送實際資料外，額外消耗的傳輸量（如標頭、控制封包）。" },
+            { m: 4, term: "Synchronization", def: "同步：傳輸雙方維持相同時序或狀態（如 TCP SYN 階段同步序號）。" },
+            { m: 4, term: "Acknowledgment", def: "確認應答 (ACK)：接收端通知發送端「已成功收到資料」的回應。" },
+            { m: 4, term: "Sequence Number", def: "序號：TCP 表頭中的欄位，確保資料能依序重組與追蹤遺失的封包。" },
+            { m: 4, term: "Window Size", def: "視窗大小：TCP 流量控制機制，決定接收端在回傳 ACK 前能接收的最大資料量。" },
+
+            // 模組五
+            { m: 5, term: "Authentication", def: "身份驗證：確認使用者或設備身份的真實性（AAA 中的第一個 A）。" },
+            { m: 5, term: "Authorization", def: "授權：確認已驗證身分者擁有何種權限與操作權力（AAA 中的第二個 A）。" },
+            { m: 5, term: "Accounting", def: "紀錄/稽核：記錄使用者在網路上所做的操作與連線時間（AAA 中的第三個 A）。" },
+            { m: 5, term: "Access Control List", def: "存取控制列表：路由器上用來過濾流量（Permit/Deny）的規則清單。" },
+            { m: 5, term: "Implicit Deny", def: "預設隱含拒絕：所有 Cisco ACL 末端預設皆有一條「拒絕所有未匹配流量」的隱藏規則。" },
+            { m: 5, term: "Mitigation", def: "緩解/減輕風險：採取措施降低網路安全威脅所帶來的影響。" },
+            { m: 5, term: "Vulnerability", def: "漏洞：系統或網路設計上的弱點，可能被駭客利用。" },
+            { m: 5, term: "Threat", def: "威脅：潛在可能對系統安全性造成危害的事件或人員。" },
+            { m: 5, term: "Exploit", def: "漏洞利用程式/攻擊：利用既有漏洞攻擊系統的具體程式碼或手法。" },
+            { m: 5, term: "Spoofing", def: "欺騙/偽造：偽造來源 IP 或 MAC 位址（如 IP Spoofing, ARP Spoofing）。" },
+            { m: 5, term: "Port Security", def: "連接埠安全性：交換機限定 Port 只能存取特定 MAC 位址的安全防禦功能。" },
+            { m: 5, term: "Sticky MAC Address", def: "黏性 MAC 位址：Port Security 自動將動態學習到的 MAC 寫入 Running-config。" },
+            { m: 5, term: "Encryption", def: "加密：將明文資料（Plaintext）轉換成密文（Ciphertext）防竊聽。" },
+            { m: 5, term: "Decryption", def: "解密：利用金鑰將密文還原成明文的過程。" },
+            { m: 5, term: "Certificate", def: "數位證書：由 CA 頒發，用以驗證公開金鑰持有者身分的電子憑證。" },
+
+            // 模組六
+            { m: 6, term: "Provisioning", def: "佈署/配置：自動或手動安裝、設定與準備網路設備使其運作的過程。" },
+            { m: 6, term: "Telemetry", def: "遙測：自動遠端收集並傳輸網路設備狀態與效能數據的技術。" },
+            { m: 6, term: "REST API", def: "RESTful 介面：軟體定義網路（SDN）中極常採用的 HTTP/HTTPS 標準介面。" },
+            { m: 6, term: "JSON", def: "JavaScript 物件表示法：輕量級資料交換格式，常用於 REST API 資料傳送。" },
+            { m: 6, term: "Congestion", def: "壅塞：網路流量超過介面處理能力時發生的塞車現象。" },
+            { m: 6, term: "Controller", def: "控制器：SDN 架構的核心靈魂（如 Cisco DNA Center），集中管理網路設備。" },
+            { m: 6, term: "Northbound Interface", def: "北向介面：控制器與上層應用程式/管理平台溝通的 API 介面。" },
+            { m: 6, term: "Southbound Interface", def: "南向介面：控制器與下方實體網路設備（Switches/Routers）溝通的協定（如 OpenFlow）。" },
+            { m: 6, term: "Troubleshooting", def: "故障排除/除錯：定位、分析並解決網路問題的系統化過程。" },
+            { m: 6, term: "Verification", def: "驗證：利用 show 或 ping 等指令確認網路配置是否成功並正常的步驟。" }
+        ];
+
+        let filteredList = [...rawData];
+        let currentIndex = 0;
+        let starredTerms = new Set();
+        let showStarredOnly = false;
+
+        const moduleNames = {
+            1: "模組一：網路基礎與拓撲",
+            2: "模組二：IP 位址與子網劃分",
+            3: "模組三：路由與交換",
+            4: "模組四：網路服務與協定",
+            5: "模組五：安全性與存取控制",
+            6: "模組六：自動化、管理與除錯"
+        };
+
+        function renderCard() {
+            const cardElement = document.getElementById("card");
+            cardElement.classList.remove("flipped");
+
+            if (filteredList.length === 0) {
+                document.getElementById("cardModule").innerText = "提示";
+                document.getElementById("cardTerm").innerText = "無符合條件單字";
+                document.getElementById("cardDef").innerText = "請切換模組或取消「僅顯示收藏」篩選。";
+                document.getElementById("progress").innerText = "0 / 0";
+                document.getElementById("starBtn").style.display = "none";
+                return;
+            }
+
+            document.getElementById("starBtn").style.display = "block";
+            const currentItem = filteredList[currentIndex];
+            document.getElementById("cardModule").innerText = moduleNames[currentItem.m];
+            document.getElementById("cardTerm").innerText = currentItem.term;
+            document.getElementById("cardDef").innerText = currentItem.def;
+            document.getElementById("progress").innerText = `${currentIndex + 1} / ${filteredList.length}`;
+
+            const starBtn = document.getElementById("starBtn");
+            if (starredTerms.has(currentItem.term)) {
+                starBtn.classList.add("starred");
+            } else {
+                starBtn.classList.remove("starred");
+            }
+        }
+
+        function speakTerm(event) {
+            // 防止觸發卡片翻面事件
+            event.stopPropagation();
+            
+            if (filteredList.length === 0) return;
+
+            const textToSpeak = filteredList[currentIndex].term;
+            
+            // 檢查瀏覽器是否支援語音功能
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // 先停止當前正在朗讀的內容
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'en-US'; // 指定英文 (美國) 發音
+                utterance.rate = 0.9;    // 朗讀速度微調 (1.0 為正常速度)
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("您的瀏覽器暫不支援語音朗讀功能！");
+            }
+        }
+
+        function flipCard() {
+            document.getElementById("card").classList.toggle("flipped");
+        }
+
+        function nextCard() {
+            if (filteredList.length === 0) return;
+            currentIndex = (currentIndex + 1) % filteredList.length;
+            renderCard();
+        }
+
+        function prevCard() {
+            if (filteredList.length === 0) return;
+            currentIndex = (currentIndex - 1 + filteredList.length) % filteredList.length;
+            renderCard();
+        }
+
+        function toggleStar(event) {
+            event.stopPropagation();
+            if (filteredList.length === 0) return;
+            const currentItem = filteredList[currentIndex];
+            if (starredTerms.has(currentItem.term)) {
+                starredTerms.delete(currentItem.term);
+            } else {
+                starredTerms.add(currentItem.term);
+            }
+            renderCard();
+            if (showStarredOnly) filterCards();
+        }
+
+        function toggleStarredOnly() {
+            showStarredOnly = !showStarredOnly;
+            const btn = document.getElementById("starFilterBtn");
+            btn.classList.toggle("active", showStarredOnly);
+            filterCards();
+        }
+
+        function filterCards() {
+            const selectedModule = document.getElementById("moduleSelect").value;
+            filteredList = rawData.filter(item => {
+                const matchModule = selectedModule === "all" || item.m == selectedModule;
+                const matchStar = !showStarredOnly || starredTerms.has(item.term);
+                return matchModule && matchStar;
+            });
+            currentIndex = 0;
+            renderCard();
+        }
+
+        function shuffleCards() {
+            for (let i = filteredList.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredList[i], filteredList[j]] = [filteredList[j], filteredList[i]];
+            }
+            currentIndex = 0;
+            renderCard();
+        }
+
+        // 初始化
+        renderCard();
+    </script>
+</body>
+</html>
