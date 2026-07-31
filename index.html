@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCNA 800 字 - 多功能學習卡</title>
+    <title>CCNA 核心單字多功能學習卡</title>
     <style>
         :root {
             --bg-color: #f7f5ed;
@@ -20,17 +20,18 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; align-items: center; padding: 20px 10px; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 15px; }
+        .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
 
-        /* 標頭與設置面板 */
-        .title { text-align: center; font-size: 20px; font-weight: bold; color: #4a4a4a; margin-bottom: 5px; }
-        .setting-panel { background-color: var(--panel-bg); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .setting-row { display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #555; }
-        select { padding: 6px 12px; border-radius: 8px; border: 1px solid #ccc; background: #fff; font-size: 14px; outline: none; }
+        .title { text-align: center; font-size: 22px; font-weight: bold; color: #333; margin-bottom: 2px; }
+        
+        /* 頂部設定面板 */
+        .setting-panel { background-color: var(--panel-bg); border-radius: 16px; padding: 12px 15px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; color: #555; }
+        select { padding: 6px 10px; border-radius: 8px; border: 1px solid #ccc; background: #fff; font-size: 14px; outline: none; }
 
-        /* 功能按鈕選單 */
-        .menu-grid { display: flex; flex-direction: column; gap: 10px; }
-        .btn { border: none; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.2s ease; }
+        /* 功能按鈕區 */
+        .menu-grid { display: flex; flex-direction: column; gap: 8px; }
+        .btn { border: none; padding: 11px; border-radius: 12px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 3px 5px rgba(0,0,0,0.08); transition: all 0.2s ease; }
         .btn:active { transform: scale(0.98); }
         .btn-overview { background-color: var(--primary-btn); }
         .btn-listen { background-color: var(--mode-listen); }
@@ -40,22 +41,23 @@
         .btn-fill { background-color: var(--mode-fill); }
         .btn-toggle { background-color: #ded7c6; color: #4a4a4a; box-shadow: none; border: 1px solid #c8c0b0; }
 
-        /* 互動卡片顯示區 */
-        .card-display { background: var(--card-bg); border-radius: 20px; padding: 25px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.08); position: relative; margin-top: 5px; }
-        .card-term { font-size: 26px; font-weight: bold; margin-bottom: 10px; }
-        .card-def { font-size: 16px; color: #555; line-height: 1.5; }
-        .star-icon { position: absolute; top: 15px; right: 15px; font-size: 22px; cursor: pointer; color: #ccc; }
+        /* 卡片顯示區 */
+        .card-display { background: var(--card-bg); border-radius: 20px; padding: 25px 20px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.08); position: relative; margin-top: 5px; }
+        .module-badge { position: absolute; top: 12px; left: 15px; font-size: 12px; background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+        .star-icon { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #ccc; }
         .star-icon.active { color: #f59e0b; }
+        .card-term { font-size: 26px; font-weight: bold; margin-bottom: 10px; }
+        .card-def { font-size: 15px; color: #555; line-height: 1.5; }
         .audio-play { font-size: 20px; cursor: pointer; margin-left: 8px; vertical-align: middle; }
 
-        /* 控制按鈕 */
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        /* 導覽按鈕與輸入框 */
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .control-btn { background: #fff; border: 1px solid #ccc; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         .input-box { width: 100%; padding: 10px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 10px; text-align: center; }
 
-        /* 全覽清單頁面 */
+        /* 全覽面板 */
         .overview-list { display: none; background: white; border-radius: 16px; padding: 15px; max-height: 400px; overflow-y: auto; text-align: left; }
-        .overview-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .overview-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -63,16 +65,29 @@
 <div class="app-container">
     <div class="title">CCNA 核心單字學習卡</div>
 
+    <!-- 頂部設定與課程篩選面板 -->
     <div class="setting-panel">
         <div class="setting-row">
-            🗣️ 腔調：
+            <span>📚 選擇課程：</span>
+            <select id="moduleSelect" onchange="updateList()">
+                <option value="all">所有模組 (100 個單字)</option>
+                <option value="1">模組一：網路基礎與拓撲</option>
+                <option value="2">模組二：IP 位址與子網劃分</option>
+                <option value="3">模組三：路由與交換</option>
+                <option value="4">模組四：網路服務與協定</option>
+                <option value="5">模組五：安全性與存取控制</option>
+                <option value="6">模組六：自動化、管理與除錯</option>
+            </select>
+        </div>
+        <div class="setting-row">
+            <span>🗣️ 腔調設定：</span>
             <select id="accentSelect">
                 <option value="en-US">美式 (US)</option>
                 <option value="en-GB">英式 (UK)</option>
             </select>
         </div>
         <div class="setting-row">
-            ⏱️ 語速：
+            <span>⏱️ 語速設定：</span>
             <select id="speedSelect">
                 <option value="0.5">0.5x</option>
                 <option value="0.75">0.75x</option>
@@ -82,6 +97,7 @@
         </div>
     </div>
 
+    <!-- 模式選擇按鈕選單 -->
     <div class="menu-grid">
         <button class="btn btn-overview" onclick="setMode('overview')">📖 全覽</button>
         <button class="btn btn-listen" onclick="setMode('listen')">👀 翻牌聽寫</button>
@@ -93,16 +109,20 @@
         <button class="btn btn-toggle" id="starFilterBtn" onclick="toggleStarFilter()">⭐ 只複習星號：關閉</button>
     </div>
 
+    <!-- 全覽檢視區 -->
     <div class="overview-list" id="overviewPanel"></div>
 
+    <!-- 主卡片互動區 -->
     <div class="card-display" id="cardPanel">
+        <span class="module-badge" id="cardModuleBadge">模組</span>
         <span class="star-icon" id="starBtn" onclick="toggleStar()">★</span>
-        <div id="cardContent">
-            <div class="card-term" id="termText">點選上方模式開始學習</div>
+        <div id="cardContent" style="width:100%;">
+            <div class="card-term" id="termText">載入中...</div>
             <div class="card-def" id="defText"></div>
         </div>
     </div>
 
+    <!-- 底部切換按鈕 -->
     <div class="controls" id="controlPanel">
         <button class="control-btn" onclick="prevCard()">上一張</button>
         <span id="progressText" style="font-weight: bold; color: #666;">0 / 0</span>
@@ -111,27 +131,51 @@
 </div>
 
 <script>
+    const moduleNames = {
+        1: "模組一", 2: "模組二", 3: "模組三",
+        4: "模組四", 5: "模組五", 6: "模組六"
+    };
+
     const rawData = [
-        { term: "Bandwidth", def: "頻寬：網路鏈路最大可傳輸資料的容量（如 1 Gbps）。", fill: "___ 代表網路鏈路最大可傳輸資料的容量。" },
-        { term: "Throughput", def: "吞吐量：單位時間內實際成功傳送的資料量。", fill: "實際成功傳送的資料量稱為 ___。" },
-        { term: "Latency", def: "延遲：封包從來源端到達目的地所需的時間。", fill: "封包傳送所需的時間稱為 ___。" },
-        { term: "Jitter", def: "抖動：封包到達時間的不穩定性。", fill: "對 VoIP 影響巨大的封包到達延遲變化稱為 ___。" },
-        { term: "Topology", def: "拓撲：網路設備與線路的架構與連接型態。", fill: "網路設備與線路的佈局架構稱為 ___。" },
-        { term: "Redundancy", def: "冗餘/備援：提供備用鏈路防止單點故障。", fill: "提供備用設備或鏈路以確保高可用性稱為 ___。" },
-        { term: "Encapsulation", def: "封裝：資料由上層往下層傳送時逐層加上 Header/Trailer。", fill: "資料下行時加上標頭的過程稱為 ___。" },
-        { term: "Decapsulation", def: "解封裝：接收端將資料逐層拆開讀取標頭的過程。", fill: "接收端拆解標頭的過程稱為 ___。" },
-        { term: "Frame", def: "資料幀：OSI 第二層（資料鏈結層）的資料格式。", fill: "OSI Layer 2 的資料單位是 ___。" },
-        { term: "Packet", def: "封包：OSI 第三層（網路層）的資料格式。", fill: "OSI Layer 3 的資料單位是 ___。" },
-        { term: "Subnet Mask", def: "子網路遮罩：用來區分 IP 位址中網路號與主機號的 32-bit 遮罩。", fill: "用來切割 IP 網段的 32 位元遮罩稱為 ___。" },
-        { term: "Default Gateway", def: "預設閘道：當設備欲傳送封包至其他子網時的預設出口路由器 IP。", fill: "跨網段通訊時封包送往的預設出口稱為 ___。" },
-        { term: "Unicast", def: "單播：一對一的通訊模式。", fill: "一對一傳送訊息的傳輸方式稱為 ___。" },
-        { term: "Broadcast", def: "廣播：一對區域網路內所有設備的通訊。", fill: "一對同網段所有主機發送訊息稱為 ___。" },
-        { term: "Multicast", def: "多播/組播：一對指定的特定群組通訊。", fill: "一對特定群組主機發送訊息稱為 ___。" },
-        { term: "Routing Table", def: "路由表：路由器核心資料庫，紀錄目標網路與相對應介面。", fill: "路由器用來尋找最佳路徑的資料庫稱為 ___。" },
-        { term: "Authentication", def: "身份驗證：確認使用者或設備身份的真實性。", fill: "AAA 機制中，驗證使用者身份稱為 ___。" }
+        // 模組一
+        { m: 1, term: "Bandwidth", def: "頻寬：網路鏈路最大可傳輸資料的容量（如 1 Gbps）。", fill: "___ 代表網路鏈路最大可傳輸資料的容量。" },
+        { m: 1, term: "Throughput", def: "吞吐量：單位時間內實際成功傳送的資料量。", fill: "單位時間內實際成功傳送的資料量稱為 ___。" },
+        { m: 1, term: "Latency", def: "延遲：封包從來源端到達目的地所需的時間。", fill: "封包傳送所需的時間稱為 ___。" },
+        { m: 1, term: "Jitter", def: "抖動：封包到達時間的不穩定性，對 VoIP 影響巨大。", fill: "封包到達時間不穩定稱為 ___。" },
+        { m: 1, term: "Topology", def: "拓撲：網路設備與線路的架構與連接型態。", fill: "網路設備與線路的佈局架構稱為 ___。" },
+        { m: 1, term: "Redundancy", def: "冗餘/備援：提供備用鏈路防止單點故障。", fill: "提供備用設備或鏈路以確保高可用性稱為 ___。" },
+        { m: 1, term: "Encapsulation", def: "封裝：資料由上層往下層傳送時逐層加上 Header/Trailer。", fill: "資料下行時加上標頭的過程稱為 ___。" },
+        { m: 1, term: "Decapsulation", def: "解封裝：接收端將資料逐層拆開讀取標頭的過程。", fill: "接收端拆解標頭的過程稱為 ___。" },
+        { m: 1, term: "Frame", def: "資料幀：OSI 第二層（資料鏈結層）的資料格式。", fill: "OSI Layer 2 的資料單位是 ___。" },
+        { m: 1, term: "Packet", def: "封包：OSI 第三層（網路層）的資料格式。", fill: "OSI Layer 3 的資料單位是 ___。" },
+
+        // 模組二
+        { m: 2, term: "Subnet Mask", def: "子網路遮罩：用來區分 IP 位址中網路號與主機號的 32-bit 遮罩。", fill: "用來區分網路號與主機號的遮罩稱為 ___。" },
+        { m: 2, term: "Default Gateway", def: "預設閘道：當設備欲傳送封包至其他子網時的預設出口 IP。", fill: "跨網段通訊時封包送往的預設出口稱為 ___。" },
+        { m: 2, term: "Unicast", def: "單播：一對一的通訊模式。", fill: "一對一傳送訊息的傳輸方式稱為 ___。" },
+        { m: 2, term: "Broadcast", def: "廣播：一對區域網路內所有設備的通訊。", fill: "一對同網段所有主機發送訊息稱為 ___。" },
+        { m: 2, term: "Multicast", def: "多播/組播：一對指定的特定群組通訊。", fill: "一對特定群組主機發送訊息稱為 ___。" },
+
+        // 模組三
+        { m: 3, term: "Routing Table", def: "路由表：路由器核心資料庫，紀錄目標網路與相對應介面。", fill: "路由器用來尋找最佳路徑的資料庫稱為 ___。" },
+        { m: 3, term: "Static Route", def: "靜態路由：由管理員手動設定的固定路由路徑。", fill: "手動設定的固定路由稱為 ___。" },
+        { m: 3, term: "Dynamic Routing", def: "動態路由：利用 OSPF 等協定自動學習與維護路徑。", fill: "路由器自動學習路徑的機制稱為 ___。" },
+        { m: 3, term: "Spanning Tree Protocol", def: "生成樹協定：防止二層交換網路產生廣播風暴（Loop 迴路）。", fill: "用來防止二層網路迴路的協定是 ___。" },
+
+        // 模組四
+        { m: 4, term: "Resolution", def: "解析：如 ARP（IP 解析為 MAC）或 DNS（域名解析為 IP）。", fill: "將域名或 IP 轉換對應的過程稱為 ___。" },
+        { m: 4, term: "Translation", def: "轉譯：如 NAT 將私有 IP 轉譯為公網 IP。", fill: "NAT 將私有 IP 轉為公網 IP 的過程稱為 ___。" },
+
+        // 模組五
+        { m: 5, term: "Authentication", def: "身份驗證：確認使用者或設備身份的真實性。", fill: "AAA 機制中，驗證使用者身份稱為 ___。" },
+        { m: 5, term: "Access Control List", def: "存取控制列表：路由器上用來過濾流量（Permit/Deny）的規則。", fill: "用來過濾網路流量的規則清單簡稱 ___。" },
+
+        // 模組六
+        { m: 6, term: "REST API", def: "RESTful 介面：SDN 中極常採用的 HTTP/HTTPS 標準介面。", fill: "SDN 中常用的 Web API 介面稱為 ___。" },
+        { m: 6, term: "Troubleshooting", def: "故障排除/除錯：定位、分析並解決網路問題的過程。", fill: "排查並解決網路故障的過程稱為 ___。" }
     ];
 
-    let currentList = [...rawData];
+    let currentList = [];
     let currentIndex = 0;
     let currentMode = 'flash-ec';
     let isShuffled = false;
@@ -150,11 +194,19 @@
     }
 
     function updateList() {
-        currentList = rawData.filter(item => !isStarFiltered || starredSet.has(item.term));
+        const selectedModule = document.getElementById("moduleSelect").value;
+        
+        currentList = rawData.filter(item => {
+            const matchModule = selectedModule === 'all' || item.m == selectedModule;
+            const matchStar = !isStarFiltered || starredSet.has(item.term);
+            return matchModule && matchStar;
+        });
+
         if (isShuffled) {
             currentList.sort(() => Math.random() - 0.5);
         }
         currentIndex = 0;
+        isAnswerRevealed = false;
         render();
     }
 
@@ -191,11 +243,15 @@
         if (currentMode === 'overview') {
             const listHtml = currentList.map(item => `
                 <div class="overview-item">
-                    <div><strong>${item.term}</strong><br><small>${item.def}</small></div>
-                    <span style="cursor:pointer;" onclick="speak('${item.term}')">🔊</span>
+                    <div>
+                        <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:10px;">${moduleNames[item.m]}</span>
+                        <strong>${item.term}</strong><br>
+                        <small style="color:#555;">${item.def}</small>
+                    </div>
+                    <span style="cursor:pointer; font-size:18px;" onclick="speak('${item.term}')">🔊</span>
                 </div>
             `).join('');
-            document.getElementById("overviewPanel").innerHTML = listHtml || "尚無資料";
+            document.getElementById("overviewPanel").innerHTML = listHtml || "<div style='text-align:center; padding:20px;'>無符合條件資料</div>";
             return;
         }
 
@@ -203,15 +259,20 @@
         const termText = document.getElementById("termText");
         const defText = document.getElementById("defText");
         const starBtn = document.getElementById("starBtn");
+        const badge = document.getElementById("cardModuleBadge");
 
         if (currentList.length === 0) {
+            badge.innerText = "提示";
             termText.innerText = "無符合條件單字";
-            defText.innerText = "";
+            defText.innerText = "請嘗試切換課程或關閉星號篩選";
             progress.innerText = "0 / 0";
+            starBtn.style.display = "none";
             return;
         }
 
+        starBtn.style.display = "block";
         const item = currentList[currentIndex];
+        badge.innerText = moduleNames[item.m];
         progress.innerText = `${currentIndex + 1} / ${currentList.length}`;
         starBtn.className = `star-icon ${starredSet.has(item.term) ? 'active' : ''}`;
 
@@ -228,7 +289,7 @@
             termText.innerHTML = `<button class="btn btn-type" onclick="speak('${item.term}')">🎧 點擊播放發音</button>`;
             defText.innerHTML = `
                 <input type="text" id="userInput" class="input-box" placeholder="請輸入聽到的英文" onkeyup="checkAnswer(event)">
-                <div id="typeFeedback" style="margin-top:10px;"></div>
+                <div id="typeFeedback" style="margin-top:8px;"></div>
             `;
             if (!isAnswerRevealed) speak(item.term);
         } else if (currentMode === 'fill') {
@@ -245,7 +306,7 @@
             if (val === correct) {
                 feedback.innerHTML = "<span style='color:green; font-weight:bold;'>✅ 正確！</span>";
             } else {
-                feedback.innerHTML = `<span style='color:red; font-weight:bold;'>❌ 錯誤，正確答案為：${currentList[currentIndex].term}</span>`;
+                feedback.innerHTML = `<span style='color:red; font-weight:bold;'>❌ 錯誤！正確答案：${currentList[currentIndex].term}</span>`;
             }
         }
     }
@@ -271,7 +332,7 @@
         render();
     }
 
-    // 初始化
+    // 初始化載入
     updateList();
 </script>
 </body>
