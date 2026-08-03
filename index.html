@@ -3,56 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CCNA 互動單字卡</title>
+  <title>CCNA 互動單字卡 (全功能版)</title>
   <style>
     :root {
-      --primary: #0076d6;
-      --primary-dark: #00569e;
-      --bg: #f4f7fb;
+      --primary: #5c9ead;
+      --primary-dark: #376370;
+      --bg: #f5f4ef;
       --card-bg: #ffffff;
       --text: #2c3e50;
-      --accent: #ff9800;
+      --accent: #e08283;
+      --btn-active: #4a7c89;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    header { width: 100%; max-width: 600px; text-align: center; margin-bottom: 15px; }
-    h1 { font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 5px; }
-    .status-bar { font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; }
-    .btn-sheet { background: #107c41; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+    header { width: 100%; max-width: 600px; text-align: center; margin-bottom: 12px; }
+    h1 { font-size: 1.5rem; color: #376370; margin-bottom: 5px; }
+    
+    .status-bar { font-size: 0.85rem; color: #555; display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; width: 100%; max-width: 600px; }
+    .btn-sheet { background: #376370; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
 
-    .controls { width: 100%; max-width: 600px; background: #fff; padding: 12px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+    .controls { width: 100%; max-width: 600px; background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
     .control-group { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; }
-    select, button { padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; background: #fff; font-size: 0.85rem; cursor: pointer; }
+    select { padding: 5px 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; font-size: 0.85rem; }
 
-    .modes { width: 100%; max-width: 600px; display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; justify-content: center; }
-    .mode-btn { flex: 1; min-width: 80px; padding: 8px 4px; font-size: 0.8rem; border: none; background: #e0e6ed; color: #475569; border-radius: 6px; font-weight: bold; }
-    .mode-btn.active { background: var(--primary); color: white; }
+    .menu-grid { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+    .mode-btn, .toggle-btn { width: 100%; padding: 10px; font-size: 0.9rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; color: white; }
+    
+    /* 模式按鈕色彩比照舊版設計 */
+    .btn-list { background-color: #6a9c89; }
+    .btn-listen-flip { background-color: #d98880; }
+    .btn-listen-key { background-color: #85a3c2; }
+    .btn-flash-en { background-color: #d4b483; }
+    .btn-flash-zh { background-color: #a3c995; }
+    .btn-cloze { background-color: #b5a2ca; }
+    .btn-toggle { background-color: #dfd8c8; color: #4a4a4a; border: 1px solid #ccc; }
+    .btn-toggle.active { background-color: #cbb89d; color: #000; font-weight: bolder; }
+    .mode-btn.active-mode { outline: 3px solid #376370; transform: scale(0.99); }
 
-    .card-container { width: 100%; max-width: 600px; height: 260px; perspective: 1000px; margin-bottom: 15px; }
-    .card { width: 100%; height: 100%; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; position: relative; cursor: pointer; transition: transform 0.3s; }
-    .card .term { font-size: 1.6rem; font-weight: bold; color: var(--primary-dark); margin-bottom: 10px; }
-    .card .meaning { font-size: 1rem; line-height: 1.4; color: #4a5568; }
-    .star-btn { position: absolute; top: 12px; right: 12px; font-size: 1.4rem; color: #ccc; cursor: pointer; border: none; background: none; }
-    .star-btn.starred { color: var(--accent); }
-    .audio-btn { position: absolute; top: 12px; left: 12px; background: none; border: none; font-size: 1.2rem; cursor: pointer; }
+    .card-container { width: 100%; max-width: 600px; min-height: 220px; perspective: 1000px; margin-bottom: 15px; }
+    .card { width: 100%; min-height: 220px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; position: relative; cursor: pointer; }
+    .card .module-badge { position: absolute; top: 12px; left: 12px; font-size: 0.75rem; background: #eef2f5; padding: 2px 8px; border-radius: 12px; color: #666; }
+    .card .term { font-size: 1.6rem; font-weight: bold; color: var(--primary-dark); margin: 10px 0; word-break: break-word; }
+    .card .meaning { font-size: 1rem; line-height: 1.5; color: #4a5568; margin-top: 5px; }
+    .star-btn { position: absolute; top: 12px; right: 12px; font-size: 1.5rem; color: #ccc; cursor: pointer; border: none; background: none; }
+    .star-btn.starred { color: #f39c12; }
+    .audio-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-bottom: 5px; }
+
+    .input-container { margin-top: 10px; width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .input-box { width: 100%; padding: 8px 12px; border: 2px solid #ccc; border-radius: 8px; font-size: 1rem; text-align: center; outline: none; }
+    .input-box:focus { border-color: var(--primary); }
+    .check-btn { padding: 6px 16px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .feedback { font-size: 0.9rem; font-weight: bold; margin-top: 5px; }
+    .feedback.correct { color: #27ae60; }
+    .feedback.wrong { color: #c0392b; }
 
     .nav-btns { width: 100%; max-width: 600px; display: flex; justify-content: space-between; gap: 10px; }
-    .nav-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; }
-    .nav-btn:disabled { background: #ccc; }
+    .nav-btn { flex: 1; padding: 10px; border: none; border-radius: 20px; background: #fff; color: var(--primary-dark); font-weight: bold; border: 1px solid #ccc; cursor: pointer; }
+    .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .full-list { width: 100%; max-width: 600px; background: white; border-radius: 10px; padding: 15px; max-height: 400px; overflow-y: auto; display: none; }
-    .list-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .full-list { width: 100%; max-width: 600px; background: white; border-radius: 10px; padding: 15px; max-height: 500px; overflow-y: auto; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .list-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; text-align: left; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>CCNA 英文單字卡 (214字完整版)</h1>
-    <div class="status-bar">
-      <span id="card-count">連線試算表中...</span>
-      <button class="btn-sheet" onclick="loadCSV()">🔄 重新整理單字</button>
-    </div>
+    <h1>CCNA 英文單字卡</h1>
   </header>
+
+  <div class="status-bar">
+    <span id="card-count">單字載入中...</span>
+    <button class="btn-sheet" onclick="loadCSV()">🔄 重新整理單字</button>
+  </div>
 
   <div class="controls">
     <div class="control-group">
@@ -72,7 +94,7 @@
     </div>
     <div class="control-group">
       <label>模組:</label>
-      <select id="module-select" onchange="filterCards()">
+      <select id="module-select" onchange="updateWorkingList()">
         <option value="all">全部模組</option>
         <option value="1">模組 1</option>
         <option value="2">模組 2</option>
@@ -84,38 +106,56 @@
     </div>
   </div>
 
-  <div class="modes">
-    <button class="mode-btn active" onclick="setMode('card-en')">英 ➔ 中</button>
-    <button class="mode-btn" onclick="setMode('card-zh')">中 ➔ 英</button>
-    <button class="mode-btn" onclick="setMode('listen')">翻牌聽寫</button>
-    <button class="mode-btn" onclick="setMode('list')">📖 全覽</button>
+  <!-- 功能選單清單（比照舊版完全一致） -->
+  <div class="menu-grid">
+    <button class="mode-btn btn-list" onclick="setMode('list')">📖 全覽</button>
+    <button class="mode-btn btn-listen-flip" onclick="setMode('listen-flip')">👀 翻牌聽寫</button>
+    <button class="mode-btn btn-listen-key" onclick="setMode('listen-key')">⌨️ 鍵盤聽寫</button>
+    <button class="mode-btn btn-flash-en active-mode" onclick="setMode('card-en')">🔤 閃卡 (英中)</button>
+    <button class="mode-btn btn-flash-zh" onclick="setMode('card-zh')">🈳 閃卡 (中英)</button>
+    <button class="mode-btn btn-cloze" onclick="setMode('cloze')">✍️ 句子填空</button>
+    
+    <button class="toggle-btn btn-toggle" id="shuffle-btn" onclick="toggleShuffle()">🔀 隨機洗牌：關閉</button>
+    <button class="toggle-btn btn-toggle" id="star-filter-btn" onclick="toggleStarFilter()">⭐ 只複習星號：關閉</button>
   </div>
 
+  <!-- 卡片主體區塊 -->
   <div class="card-container" id="card-box">
-    <div class="card" onclick="flipCard()">
-      <button class="audio-btn" onclick="speakCurrent(event)">🔊</button>
+    <div class="card" onclick="handleCardClick()">
+      <span class="module-badge" id="card-module">模組 -</span>
       <button class="star-btn" id="star-icon" onclick="toggleStar(event)">★</button>
-      <div class="term" id="card-main">單字載入中...</div>
+      <button class="audio-btn" id="audio-btn" onclick="speakCurrent(event)">🔊</button>
+      
+      <div class="term" id="card-main">載入中...</div>
       <div class="meaning" id="card-sub" style="display:none;"></div>
+
+      <div class="input-container" id="input-area" style="display:none;" onclick="event.stopPropagation()">
+        <input type="text" class="input-box" id="user-input" placeholder="請輸入英文單字..." onkeypress="handleKeyPress(event)">
+        <button class="check-btn" onclick="checkAnswer()">對答案</button>
+        <div class="feedback" id="feedback-msg"></div>
+      </div>
     </div>
   </div>
 
+  <!-- 全覽列表區塊 -->
   <div class="full-list" id="full-list"></div>
 
+  <!-- 上一張 / 下一張 導覽列 -->
   <div class="nav-btns" id="nav-controls">
-    <button class="nav-btn" onclick="prevCard()">上一張</button>
-    <button class="nav-btn" onclick="nextCard()">下一張</button>
+    <button class="nav-btn" onclick="prevCard()" id="prev-btn">上一張</button>
+    <button class="nav-btn" onclick="nextCard()" id="next-btn">下一張</button>
   </div>
 
 <script>
-  // 已經預先寫入你的 214 字完整版雲端試算表網址
   const CSV_URL = "https://docs.google.com/spreadsheets/d/138QBsvjZAgtx2WNDGyC2XJTgscV-4SOwYupGX44cXYU/export?format=csv";
   
   let rawCards = [];
-  let filteredCards = [];
+  let workingCards = [];
   let currentIndex = 0;
   let isFlipped = false;
   let currentMode = 'card-en';
+  let isShuffle = false;
+  let isStarOnly = false;
   let starredIds = new Set(JSON.parse(localStorage.getItem('ccna_stars') || '[]'));
 
   async function loadCSV() {
@@ -143,79 +183,161 @@
         });
       }
     }
-    filterCards();
+    updateWorkingList();
   }
 
-  function filterCards() {
+  function updateWorkingList() {
     const mod = document.getElementById('module-select').value;
-    filteredCards = mod === 'all' ? [...rawCards] : rawCards.filter(c => c.module === mod);
+    let list = [...rawCards];
+
+    if (mod !== 'all') {
+      list = list.filter(c => c.module === mod);
+    }
+    if (isStarOnly) {
+      list = list.filter(c => starredIds.has(c.id));
+    }
+    if (isShuffle) {
+      list.sort(() => Math.random() - 0.5);
+    }
+
+    workingCards = list;
     currentIndex = 0;
     renderCard();
   }
 
   function renderCard() {
-    if(!filteredCards.length) return;
-    const card = filteredCards[currentIndex];
     const mainEl = document.getElementById('card-main');
     const subEl = document.getElementById('card-sub');
+    const moduleEl = document.getElementById('card-module');
     const starIcon = document.getElementById('star-icon');
+    const inputArea = document.getElementById('input-area');
+    const feedback = document.getElementById('feedback-msg');
+    const userInput = document.getElementById('user-input');
 
-    document.getElementById('card-count').innerText = `卡片：${currentIndex + 1} / ${filteredCards.length}`;
-    starIcon.classList.toggle('starred', starredIds.has(card.id));
+    feedback.innerText = '';
+    userInput.value = '';
     isFlipped = false;
+
+    if (!workingCards.length) {
+      document.getElementById('card-count').innerText = "卡片：0 / 0";
+      mainEl.innerText = "沒有符合條件的單字";
+      subEl.style.display = 'none';
+      inputArea.style.display = 'none';
+      moduleEl.innerText = "模組 -";
+      return;
+    }
+
+    const card = workingCards[currentIndex];
+    document.getElementById('card-count').innerText = `卡片：${currentIndex + 1} / ${workingCards.length}`;
+    moduleEl.innerText = `模組 ${card.module}`;
+    starIcon.classList.toggle('starred', starredIds.has(card.id));
 
     if (currentMode === 'card-en') {
       mainEl.innerText = card.term;
       subEl.innerText = card.meaning;
       subEl.style.display = 'none';
+      inputArea.style.display = 'none';
     } else if (currentMode === 'card-zh') {
       mainEl.innerText = card.meaning;
       subEl.innerText = card.term;
       subEl.style.display = 'none';
-    } else if (currentMode === 'listen') {
+      inputArea.style.display = 'none';
+    } else if (currentMode === 'listen-flip') {
       mainEl.innerText = "🎧 點擊聽發音";
       subEl.innerText = `${card.term}\n${card.meaning}`;
       subEl.style.display = 'none';
+      inputArea.style.display = 'none';
       speakText(card.term);
+    } else if (currentMode === 'listen-key') {
+      mainEl.innerText = "🎧 點擊播放發音";
+      subEl.innerText = `${card.term}\n${card.meaning}`;
+      subEl.style.display = 'none';
+      inputArea.style.display = 'flex';
+      speakText(card.term);
+    } else if (currentMode === 'cloze') {
+      mainEl.innerText = card.meaning;
+      subEl.innerText = card.term;
+      subEl.style.display = 'none';
+      inputArea.style.display = 'flex';
     }
   }
 
-  function flipCard() {
+  function handleCardClick() {
+    if (currentMode === 'list') return;
     const subEl = document.getElementById('card-sub');
-    if (currentMode !== 'list') {
-      isFlipped = !isFlipped;
-      subEl.style.display = isFlipped ? 'block' : 'none';
+    isFlipped = !isFlipped;
+    subEl.style.display = isFlipped ? 'block' : 'none';
+  }
+
+  function checkAnswer() {
+    if (!workingCards.length) return;
+    const card = workingCards[currentIndex];
+    const val = document.getElementById('user-input').value.trim().toLowerCase();
+    const ans = card.term.trim().toLowerCase();
+    const feedback = document.getElementById('feedback-msg');
+    const subEl = document.getElementById('card-sub');
+
+    if (val === ans) {
+      feedback.innerText = "✅ 正確！";
+      feedback.className = "feedback correct";
+      subEl.style.display = 'block';
+    } else {
+      feedback.innerText = `❌ 再試一次！答案是：${card.term}`;
+      feedback.className = "feedback wrong";
+      subEl.style.display = 'block';
     }
   }
 
-  function nextCard() { if(currentIndex < filteredCards.length - 1) { currentIndex++; renderCard(); } }
+  function handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      checkAnswer();
+    }
+  }
+
+  function nextCard() { if(currentIndex < workingCards.length - 1) { currentIndex++; renderCard(); } }
   function prevCard() { if(currentIndex > 0) { currentIndex--; renderCard(); } }
+
+  function toggleShuffle() {
+    isShuffle = !isShuffle;
+    const btn = document.getElementById('shuffle-btn');
+    btn.classList.toggle('active', isShuffle);
+    btn.innerText = `🔀 隨機洗牌：${isShuffle ? '開啟' : '關閉'}`;
+    updateWorkingList();
+  }
+
+  function toggleStarFilter() {
+    isStarOnly = !isStarOnly;
+    const btn = document.getElementById('star-filter-btn');
+    btn.classList.toggle('active', isStarOnly);
+    btn.innerText = `⭐ 只複習星號：${isStarOnly ? '開啟' : '關閉'}`;
+    updateWorkingList();
+  }
 
   function setMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active-mode'));
+    event.target.classList.add('active-mode');
+
     document.getElementById('card-box').style.display = mode === 'list' ? 'none' : 'block';
     document.getElementById('nav-controls').style.display = mode === 'list' ? 'none' : 'flex';
     document.getElementById('full-list').style.display = mode === 'list' ? 'block' : 'none';
 
-    if(mode === 'list') renderList(); else renderCard();
+    if (mode === 'list') renderList(); else renderCard();
   }
 
   function renderList() {
     const listEl = document.getElementById('full-list');
-    listEl.innerHTML = filteredCards.map(c => `
+    listEl.innerHTML = workingCards.map(c => `
       <div class="list-item">
         <div><strong>${c.term}</strong><br><small>${c.meaning}</small></div>
-        <button onclick="speakText('${c.term}')">🔊</button>
+        <button onclick="speakText('${c.term}')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">🔊</button>
       </div>
     `).join('');
   }
 
   function speakCurrent(e) {
     e.stopPropagation();
-    if(filteredCards[currentIndex]) speakText(filteredCards[currentIndex].term);
+    if(workingCards[currentIndex]) speakText(workingCards[currentIndex].term);
   }
 
   function speakText(text) {
@@ -228,7 +350,8 @@
 
   function toggleStar(e) {
     e.stopPropagation();
-    const card = filteredCards[currentIndex];
+    if(!workingCards.length) return;
+    const card = workingCards[currentIndex];
     if(starredIds.has(card.id)) starredIds.delete(card.id);
     else starredIds.add(card.id);
     localStorage.setItem('ccna_stars', JSON.stringify([...starredIds]));
