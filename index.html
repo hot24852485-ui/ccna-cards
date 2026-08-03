@@ -65,12 +65,11 @@
 <div class="app-container">
     <div class="title">CCNA 核心單字學習卡</div>
 
-    <!-- 頂部設定與課程篩選面板 -->
     <div class="setting-panel">
         <div class="setting-row">
             <span>📚 選擇課程：</span>
             <select id="moduleSelect" onchange="updateList()">
-                <option value="all">所有模組 (100 個單字)</option>
+                <option value="all">所有模組</option>
                 <option value="1">模組一：網路基礎與拓撲</option>
                 <option value="2">模組二：IP 位址與子網劃分</option>
                 <option value="3">模組三：路由與交換</option>
@@ -97,7 +96,6 @@
         </div>
     </div>
 
-    <!-- 模式選擇按鈕選單 -->
     <div class="menu-grid">
         <button class="btn btn-overview" onclick="setMode('overview')">📖 全覽</button>
         <button class="btn btn-listen" onclick="setMode('listen')">👀 翻牌聽寫</button>
@@ -109,10 +107,8 @@
         <button class="btn btn-toggle" id="starFilterBtn" onclick="toggleStarFilter()">⭐ 只複習星號：關閉</button>
     </div>
 
-    <!-- 全覽檢視區 -->
     <div class="overview-list" id="overviewPanel"></div>
 
-    <!-- 主卡片互動區 -->
     <div class="card-display" id="cardPanel">
         <span class="module-badge" id="cardModuleBadge">模組</span>
         <span class="star-icon" id="starBtn" onclick="toggleStar()">★</span>
@@ -122,7 +118,6 @@
         </div>
     </div>
 
-    <!-- 底部切換按鈕 -->
     <div class="controls" id="controlPanel">
         <button class="control-btn" onclick="prevCard()">上一張</button>
         <span id="progressText" style="font-weight: bold; color: #666;">0 / 0</span>
@@ -148,6 +143,7 @@
         { m: 1, term: "Decapsulation", def: "解封裝：接收端將資料逐層拆開讀取標頭的過程。", fill: "接收端拆解標頭的過程稱為 ___。" },
         { m: 1, term: "Frame", def: "資料幀：OSI 第二層（資料鏈結層）的資料格式。", fill: "OSI Layer 2 的資料單位是 ___。" },
         { m: 1, term: "Packet", def: "封包：OSI 第三層（網路層）的資料格式。", fill: "OSI Layer 3 的資料單位是 ___。" },
+        { m: 1, term: "Adapter", def: "轉接器 / 網卡：常見如 USB 轉 Serial/Console 的轉接線，或是電腦的網路介面卡 (Network Adapter)。", fill: "將電腦 USB 轉為 Console 控制埠的轉接線稱為 USB-to-Serial ___。" },
 
         // 模組二
         { m: 2, term: "Subnet Mask", def: "子網路遮罩：用來區分 IP 位址中網路號與主機號的 32-bit 遮罩。", fill: "用來區分網路號與主機號的遮罩稱為 ___。" },
@@ -161,6 +157,8 @@
         { m: 3, term: "Static Route", def: "靜態路由：由管理員手動設定的固定路由路徑。", fill: "手動設定的固定路由稱為 ___。" },
         { m: 3, term: "Dynamic Routing", def: "動態路由：利用 OSPF 等協定自動學習與維護路徑。", fill: "路由器自動學習路徑的機制稱為 ___。" },
         { m: 3, term: "Spanning Tree Protocol", def: "生成樹協定：防止二層交換網路產生廣播風暴（Loop 迴路）。", fill: "用來防止二層網路迴路的協定是 ___。" },
+        { m: 3, term: "Catalyst", def: "Catalyst 系列：Cisco 企業區域網路 (Campus LAN) 交換機的主力產品線。", fill: "Cisco 用於企業區域網路 (Campus LAN) 的旗艦交換機產品線是 ___ 系列。" },
+        { m: 3, term: "Nexus", def: "Nexus 系列：Cisco 專為資料中心 (Data Center) 打造的高性能交換機產品線（運行 NX-OS）。", fill: "Cisco 專為資料中心 (Data Center) 設計的高效能交換機產品線是 ___ 系列。" },
 
         // 模組四
         { m: 4, term: "Resolution", def: "解析：如 ARP（IP 解析為 MAC）或 DNS（域名解析為 IP）。", fill: "將域名或 IP 轉換對應的過程稱為 ___。" },
@@ -172,13 +170,9 @@
 
         // 模組六
         { m: 6, term: "REST API", def: "RESTful 介面：SDN 中極常採用的 HTTP/HTTPS 標準介面。", fill: "SDN 中常用的 Web API 介面稱為 ___。" },
-        { m: 6, term: "Troubleshooting", def: "故障排除/除錯：定位、分析並解決網路問題的過程。", fill: "排查並解決網路故障的過程稱為 ___。" }
+        { m: 6, term: "Troubleshooting", def: "故障排除/除錯：定位、分析並解決網路問題的過程。", fill: "排查並解決網路故障的過程稱為 ___。" },
+        { m: 6, term: "Terminal Emulator", def: "終端模擬器：用於透過 Console 埠或 SSH 連線管理 Cisco 設備 CLI 的軟體（如 PuTTY, Tera Term）。", fill: "用於連線與管理 Cisco 設備命令列 (CLI) 的軟體稱為 ___。" }
     ];
-            { m: 6, term: "Terminal Emulator", def: "終端模擬器：用於透過 Console 埠或 SSH 連線管理 Cisco 設備 CLI 的軟體（如 PuTTY, Tera Term）。", fill: "用於連線與管理 Cisco 設備命令列 (CLI) 的軟體稱為 ___。" },
-        { m: 1, term: "Adapter", def: "轉接器 / 網卡：常見如 USB 轉 Serial/Console 的轉接線，或是電腦的網路介面卡 (Network Adapter)。", fill: "將電腦 USB 轉為 Console 控制埠的轉接線稱為 USB-to-Serial ___。" },
-        { m: 3, term: "Catalyst", def: "Catalyst 系列：Cisco 企業區域網路 (Campus LAN) 交換機的主力產品線。", fill: "Cisco 用於企業區域網路 (Campus LAN) 的旗艦交換機產品線是 ___ 系列。" },
-        { m: 3, term: "Nexus", def: "Nexus 系列：Cisco 專為資料中心 (Data Center) 打造的高性能交換機產品線（運行 NX-OS）。", fill: "Cisco 專為資料中心 (Data Center) 設計的高效能交換機產品線是 ___ 系列。" },
-
 
     let currentList = [];
     let currentIndex = 0;
