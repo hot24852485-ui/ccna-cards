@@ -58,7 +58,6 @@
 
     .nav-btns { width: 100%; max-width: 600px; display: flex; justify-content: space-between; gap: 10px; }
     .nav-btn { flex: 1; padding: 10px; border: none; border-radius: 20px; background: #fff; color: var(--primary-dark); font-weight: bold; border: 1px solid #ccc; cursor: pointer; }
-    .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .full-list { width: 100%; max-width: 600px; background: white; border-radius: 10px; padding: 15px; max-height: 500px; overflow-y: auto; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .list-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; text-align: left; }
@@ -94,7 +93,6 @@
       </div>
     </div>
 
-    <!-- 模組選單（已升級為中文） -->
     <div class="control-group">
       <label style="white-space:nowrap;">模組:</label>
       <select id="module-select" onchange="updateWorkingList()">
@@ -302,8 +300,26 @@
     }
   }
 
-  function nextCard() { if(currentIndex < workingCards.length - 1) { currentIndex++; renderCard(); } }
-  function prevCard() { if(currentIndex > 0) { currentIndex--; renderCard(); } }
+  // 循環輪迴切換上一張與下一張
+  function nextCard() {
+    if (!workingCards.length) return;
+    if (currentIndex < workingCards.length - 1) {
+      currentIndex++;
+    } else {
+      currentIndex = 0; // 循環回到第一張
+    }
+    renderCard();
+  }
+
+  function prevCard() {
+    if (!workingCards.length) return;
+    if (currentIndex > 0) {
+      currentIndex--;
+    } else {
+      currentIndex = workingCards.length - 1; // 循環回到最後一張
+    }
+    renderCard();
+  }
 
   function toggleShuffle() {
     isShuffle = !isShuffle;
