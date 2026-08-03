@@ -1,527 +1,245 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCNA 核心單字多功能學習卡</title>
-    <style>
-        :root {
-            --bg-color: #f7f5ed;
-            --panel-bg: #f2ede0;
-            --primary-btn: #709f93;
-            --mode-listen: #d19ca0;
-            --mode-type: #8ca3be;
-            --mode-flash-ec: #d8be91;
-            --mode-flash-ce: #a7c58f;
-            --mode-fill: #bfa6d6;
-            --card-bg: #ffffff;
-            --text-dark: #2c3e50;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCNA 互動單字卡 (Google Sheet 動態同步版)</title>
+  <style>
+    :root {
+      --primary: #0076d6;
+      --primary-dark: #00569e;
+      --bg: #f4f7fb;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --accent: #ff9800;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+    header { width: 100%; max-width: 600px; text-align: center; margin-bottom: 15px; }
+    h1 { font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 5px; }
+    .status-bar { font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; }
+    .btn-sheet { background: #107c41; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+    
+    .controls { width: 100%; max-width: 600px; background: #fff; padding: 12px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+    .control-group { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; }
+    select, button { padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; background: #fff; font-size: 0.85rem; cursor: pointer; }
+    
+    .modes { width: 100%; max-width: 600px; display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; justify-content: center; }
+    .mode-btn { flex: 1; min-width: 80px; padding: 8px 4px; font-size: 0.8rem; border: none; background: #e0e6ed; color: #475569; border-radius: 6px; font-weight: bold; }
+    .mode-btn.active { background: var(--primary); color: white; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; align-items: center; padding: 20px 10px; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 12px; }
+    .card-container { width: 100%; max-width: 600px; height: 260px; perspective: 1000px; margin-bottom: 15px; }
+    .card { width: 100%; height: 100%; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; position: relative; cursor: pointer; transition: transform 0.3s; }
+    .card .term { font-size: 1.6rem; font-weight: bold; color: var(--primary-dark); margin-bottom: 10px; }
+    .card .meaning { font-size: 1rem; line-height: 1.4; color: #4a5568; }
+    .star-btn { position: absolute; top: 12px; right: 12px; font-size: 1.4rem; color: #ccc; cursor: pointer; border: none; background: none; }
+    .star-btn.starred { color: var(--accent); }
+    .audio-btn { position: absolute; top: 12px; left: 12px; background: none; border: none; font-size: 1.2rem; cursor: pointer; }
 
-        .title { text-align: center; font-size: 22px; font-weight: bold; color: #333; margin-bottom: 2px; }
-        
-        /* 頂部設定面板 */
-        .setting-panel { background-color: var(--panel-bg); border-radius: 16px; padding: 12px 15px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .setting-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; color: #555; }
-        select { padding: 6px 10px; border-radius: 8px; border: 1px solid #ccc; background: #fff; font-size: 14px; outline: none; }
+    .nav-btns { width: 100%; max-width: 600px; display: flex; justify-content: space-between; gap: 10px; }
+    .nav-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; }
+    .nav-btn:disabled { background: #ccc; }
 
-        /* 功能按鈕區 */
-        .menu-grid { display: flex; flex-direction: column; gap: 8px; }
-        .btn { border: none; padding: 11px; border-radius: 12px; font-size: 15px; font-weight: bold; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 3px 5px rgba(0,0,0,0.08); transition: all 0.2s ease; }
-        .btn:active { transform: scale(0.98); }
-        .btn-overview { background-color: var(--primary-btn); }
-        .btn-listen { background-color: var(--mode-listen); }
-        .btn-type { background-color: var(--mode-type); }
-        .btn-flash-ec { background-color: var(--mode-flash-ec); }
-        .btn-flash-ce { background-color: var(--mode-flash-ce); }
-        .btn-fill { background-color: var(--mode-fill); }
-        .btn-toggle { background-color: #ded7c6; color: #4a4a4a; box-shadow: none; border: 1px solid #c8c0b0; }
-
-        /* 卡片顯示區 */
-        .card-display { background: var(--card-bg); border-radius: 20px; padding: 25px 20px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.08); position: relative; margin-top: 5px; }
-        .module-badge { position: absolute; top: 12px; left: 15px; font-size: 12px; background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
-        .star-icon { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #ccc; }
-        .star-icon.active { color: #f59e0b; }
-        .card-term { font-size: 26px; font-weight: bold; margin-bottom: 10px; }
-        .card-def { font-size: 15px; color: #555; line-height: 1.5; }
-        .audio-play { font-size: 20px; cursor: pointer; margin-left: 8px; vertical-align: middle; }
-
-        /* 導覽按鈕與輸入框 */
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .control-btn { background: #fff; border: 1px solid #ccc; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .input-box { width: 100%; padding: 10px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px; margin-top: 10px; text-align: center; }
-
-        /* 全覽面板 */
-        .overview-list { display: none; background: white; border-radius: 16px; padding: 15px; max-height: 400px; overflow-y: auto; text-align: left; }
-        .overview-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    </style>
+    .full-list { width: 100%; max-width: 600px; background: white; border-radius: 10px; padding: 15px; max-height: 400px; overflow-y: auto; display: none; }
+    .list-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="title">CCNA 核心單字學習卡</div>
-
-    <div class="setting-panel">
-        <div class="setting-row">
-            <span>📚 選擇課程：</span>
-            <select id="moduleSelect" onchange="updateList()">
-                <option value="all">所有模組 (180+ 個單字)</option>
-                <option value="1">模組一：網路基礎與拓撲</option>
-                <option value="2">模組二：IP 位址與子網劃分</option>
-                <option value="3">模組三：路由與交換</option>
-                <option value="4">模組四：網路服務與協定</option>
-                <option value="5">模組五：安全性與存取控制</option>
-                <option value="6">模組六：自動化、管理與除錯</option>
-            </select>
-        </div>
-        <div class="setting-row">
-            <span>🗣️ 腔調設定：</span>
-            <select id="accentSelect">
-                <option value="en-US">美式 (US)</option>
-                <option value="en-GB">英式 (UK)</option>
-            </select>
-        </div>
-        <div class="setting-row">
-            <span>⏱️ 語速設定：</span>
-            <select id="speedSelect">
-                <option value="0.5">0.5x</option>
-                <option value="0.75">0.75x</option>
-                <option value="1.0" selected>1.0x</option>
-                <option value="1.25">1.25x</option>
-            </select>
-        </div>
+  <header>
+    <h1>CCNA 英文單字卡</h1>
+    <div class="status-bar">
+      <span id="card-count">連線試算表中...</span>
+      <button class="btn-sheet" onclick="promptSheetUrl()">🔄 重新整理單字</button>
     </div>
+  </header>
 
-    <div class="menu-grid">
-        <button class="btn btn-overview" onclick="setMode('overview')">📖 全覽</button>
-        <button class="btn btn-listen" onclick="setMode('listen')">👀 翻牌聽寫</button>
-        <button class="btn btn-type" onclick="setMode('type')">⌨️ 鍵盤聽寫</button>
-        <button class="btn btn-flash-ec" onclick="setMode('flash-ec')">🔤 閃卡 (英中)</button>
-        <button class="btn btn-flash-ce" onclick="setMode('flash-ce')">🈳 閃卡 (中英)</button>
-        <button class="btn btn-fill" onclick="setMode('fill')">✍️ 句子填空</button>
-        <button class="btn btn-toggle" id="shuffleBtn" onclick="toggleShuffle()">🔀 隨機洗牌：關閉</button>
-        <button class="btn btn-toggle" id="starFilterBtn" onclick="toggleStarFilter()">⭐ 只複習星號：關閉</button>
+  <div class="controls">
+    <div class="control-group">
+      <label>口音:</label>
+      <select id="voice-select">
+        <option value="en-US">美音 US</option>
+        <option value="en-GB">英音 UK</option>
+      </select>
     </div>
-
-    <div class="overview-list" id="overviewPanel"></div>
-
-    <div class="card-display" id="cardPanel">
-        <span class="module-badge" id="cardModuleBadge">模組</span>
-        <span class="star-icon" id="starBtn" onclick="toggleStar()">★</span>
-        <div id="cardContent" style="width:100%;">
-            <div class="card-term" id="termText">載入中...</div>
-            <div class="card-def" id="defText"></div>
-        </div>
+    <div class="control-group">
+      <label>語速:</label>
+      <select id="speed-select">
+        <option value="0.75">0.75x</option>
+        <option value="1.0" selected>1.0x</option>
+        <option value="1.25">1.25x</option>
+      </select>
     </div>
-
-    <div class="controls" id="controlPanel">
-        <button class="control-btn" onclick="prevCard()">上一張</button>
-        <span id="progressText" style="font-weight: bold; color: #666;">0 / 0</span>
-        <button class="control-btn" onclick="nextCard()">下一張</button>
+    <div class="control-group">
+      <label>模組:</label>
+      <select id="module-select" onchange="filterCards()">
+        <option value="all">全部模組</option>
+        <option value="1">模組 1</option>
+        <option value="2">模組 2</option>
+        <option value="3">模組 3</option>
+        <option value="4">模組 4</option>
+        <option value="5">模組 5</option>
+        <option value="6">模組 6</option>
+      </select>
     </div>
-</div>
+  </div>
+
+  <div class="modes">
+    <button class="mode-btn active" onclick="setMode('card-en')">英 ➔ 中</button>
+    <button class="mode-btn" onclick="setMode('card-zh')">中 ➔ 英</button>
+    <button class="mode-btn" onclick="setMode('listen')">翻牌聽寫</button>
+    <button class="mode-btn" onclick="setMode('list')">📖 全覽</button>
+  </div>
+
+  <div class="card-container" id="card-box">
+    <div class="card" onclick="flipCard()">
+      <button class="audio-btn" onclick="speakCurrent(event)">🔊</button>
+      <button class="star-btn" id="star-icon" onclick="toggleStar(event)">★</button>
+      <div class="term" id="card-main">單字載入中...</div>
+      <div class="meaning" id="card-sub" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div class="full-list" id="full-list"></div>
+
+  <div class="nav-btns" id="nav-controls">
+    <button class="nav-btn" onclick="prevCard()">上一張</button>
+    <button class="nav-btn" onclick="nextCard()">下一張</button>
+  </div>
 
 <script>
-    const moduleNames = {
-        1: "模組一", 2: "模組二", 3: "模組三",
-        4: "模組四", 5: "模組五", 6: "模組六"
-    };
+  // 預設直接寫入你的 Google 試算表 CSV 網址
+  const DEFAULT_CSV_URL = "https://docs.google.com/spreadsheets/d/11TPk1y13fu6YPRX5Ai0zTHIaaD1ZPoz1MXW9oj18ow0/export?format=csv";
+  
+  let rawCards = [];
+  let filteredCards = [];
+  let currentIndex = 0;
+  let isFlipped = false;
+  let currentMode = 'card-en';
+  let starredIds = new Set(JSON.parse(localStorage.getItem('ccna_stars') || '[]'));
 
-    const rawData = [
-        // 模組一：網路基礎與拓撲
-        { m: 1, term: "Bandwidth", def: "頻寬：網路鏈路最大可傳輸資料的容量（如 1 Gbps）。", fill: "___ 代表網路鏈路最大可傳輸資料的容量。" },
-        { m: 1, term: "Throughput", def: "吞吐量：單位時間內實際成功傳送的資料量。", fill: "單位時間內實際成功傳送的資料量稱為 ___。" },
-        { m: 1, term: "Latency", def: "延遲：封包從來源端到達目的地所需的時間。", fill: "封包傳送所需的時間稱為 ___。" },
-        { m: 1, term: "Jitter", def: "抖動：封包到達時間的不穩定性，對 VoIP 語音通話影響巨大。", fill: "封包到達時間不穩定稱為 ___。" },
-        { m: 1, term: "Topology", def: "拓撲：網路設備與線路的架構與連接型態。", fill: "網路設備與線路的佈局架構稱為 ___。" },
-        { m: 1, term: "Star Topology", def: "星狀拓撲：所有節點皆連接至中央裝置（如 Switch）的架構。", fill: "所有節點連接至中央裝置的架構稱為 ___。" },
-        { m: 1, term: "Mesh Topology", def: "網狀拓撲：設備間具備多條相互備援連接的架構。", fill: "設備間具備多條相互備援連接的架構稱為 ___。" },
-        { m: 1, term: "Redundancy", def: "冗餘/備援：提供備用鏈路或設備，防止單點故障。", fill: "提供備用設備或鏈路以確保高可用性稱為 ___。" },
-        { m: 1, term: "Encapsulation", def: "封裝：資料由上層往下層傳輸時，逐層加上 Header/Trailer 的過程。", fill: "資料下行時加上標頭的過程稱為 ___。" },
-        { m: 1, term: "Decapsulation", def: "解封裝：接收端將接收到的資料逐層拆開並讀取標頭資訊的過程。", fill: "接收端拆解標頭的過程稱為 ___。" },
-        { m: 1, term: "Payload", def: "有效負載：封包中去除 Header/Trailer 後實際要傳送的資料內容。", fill: "去除 Header 後實際傳送的資料稱為 ___。" },
-        { m: 1, term: "Frame", def: "資料幀：OSI 第二層（資料鏈結層）的資料格式。", fill: "OSI Layer 2 的資料單位是 ___。" },
-        { m: 1, term: "Packet", def: "封包：OSI 第三層（網路層）的資料格式。", fill: "OSI Layer 3 的資料單位是 ___。" },
-        { m: 1, term: "Segment", def: "區段：OSI 第四層（傳輸層）的資料格式（如 TCP Segment）。", fill: "OSI Layer 4 的資料單位是 ___。" },
-        { m: 1, term: "Header", def: "表頭/標頭：放置控制資訊（如來源與目的 IP/MAC 位址）的欄位。", fill: "放置來源與目的位址等控制資訊的欄位稱為 ___。" },
-        { m: 1, term: "Trailer", def: "頁尾/標尾：附在資料幀末端，通常包含 FCS 錯誤檢查碼。", fill: "附在資料幀末端包含 FCS 檢查碼的欄位稱為 ___。" },
-        { m: 1, term: "Duplex", def: "雙工模式：指資料傳輸的方向性（Full-duplex / Half-duplex）。", fill: "指資料傳輸方向性的模式稱為 ___。" },
-        { m: 1, term: "Half-Duplex", def: "半雙工：同一時間只能單向傳輸（如使用 Hub，需 CSMA/CD）。", fill: "同一時間只能單向傳輸的模式稱為 ___。" },
-        { m: 1, term: "Full-Duplex", def: "全雙工：可同時進行雙向傳輸（如現代 Switch）。", fill: "可同時進行雙向傳輸的模式稱為 ___。" },
-        { m: 1, term: "Attenuation", def: "訊號衰減：訊號在傳輸介質中隨距離延伸而變弱的現象。", fill: "訊號隨傳輸距離變弱的現象稱為 ___。" },
-        { m: 1, term: "Adapter", def: "轉接器 / 網卡：常見如 USB 轉 Serial/Console 轉接線，或是電腦的網路介面卡 (Network Adapter)。", fill: "將電腦 USB 轉為 Console 控制埠的轉接線稱為 USB-to-Serial ___。" },
-        { m: 1, term: "across", def: "透過 / 跨越：跨越網路區域或穿過設備傳輸流量。", fill: "封包穿過網路區域稱為流量傳輸 ___ 個網段。" },
-        { m: 1, term: "adjust", def: "調整：修改設定參數以優化網路運作。", fill: "管理者可 ___ 介面頻寬設定值。" },
-        { m: 1, term: "advantages", "def": "優點：使用特定網路技術或拓撲所帶來的益處。", fill: "冗餘設計的主要 ___ 是提高網路可用性。" },
-        { m: 1, term: "bound", def: "關聯的 / 綁定：受約束或已綁定於特定介面。", fill: "該服務已 ___ 於特定 IP 位址。" },
-        { m: 1, term: "calculate", def: "計算：運算路徑 Cost 或子網位址。", fill: "OSPF 會 ___ 到達目標網路的最佳 Cost 值。" },
-        { m: 1, term: "closest", def: "最近的：地理距離或邏輯 Metric 最接近的節點。", fill: "Anycast 會將流量引導至 ___ 的伺服器。" },
-        { m: 1, term: "combine", def: "結合：將多個鏈路或技術組合運用。", fill: "EtherChannel 可 ___ 多條實體鏈路。" },
-        { m: 1, term: "compatible", def: "相容：不同設備或協定之間能相互配合運作。", fill: "確保硬體設備與新協定相互 ___。" },
-        { m: 1, term: "condition", def: "條件：判定規則或網路狀態情境。", fill: "匹配特定的網路 ___ 以套用策略。" },
-        { m: 1, term: "current", def: "當前的：目前正在發生的狀態或配置。", fill: "檢視設備 ___ 運行的組態檔。" },
-        { m: 1, term: "effect", def: "影響/效果：變更設定對網路產生的結果。", fill: "重置設備會對網路連線產生重大 ___。" },
-        { m: 1, term: "efficiency", def: "效率：網路傳輸或資源利用的效能表現。", fill: "優化路由表可提高封包轉發的 ___。" },
-        { m: 1, term: "entire", def: "全部的 / 整個：影響整個網路或系統範圍。", fill: "廣播風暴會癱瘓 ___ 區域網路。" },
-        { m: 1, term: "equally", def: "相等地：均等分配（如負載平衡）。", fill: "多條路徑可 ___ 分擔流量負載。" },
-        { m: 1, term: "establishes", def: "建立：建立連線、鄰接關係或通道。", fill: "路由器與鄰居 ___ OSPF 鄰接關係。" },
-        { m: 1, term: "failure", def: "失敗/故障：硬體或鏈路停止正常服務。", fill: "單點 ___ 可能導致整個網路中斷。" },
-        { m: 1, term: "granular control", def: "細微控制：精細顆粒度的管理與規則控制。", fill: "ACL 能提供精細的 ___ 來過濾流量。" },
-        { m: 1, term: "handle", "def": "處理：設備接收並處理封包或事件。", fill: "CPU 負責 ___ 複雜的控制層封包。" },
-        { m: 1, term: "identify", def: "識別：辨識封包來源、目的或流量類型。", fill: "交換機依據標籤 ___ 流量所屬的 VLAN。" },
-        { m: 1, term: "implementation", def: "實行/佈署：將網路設計計畫實際落地執行。", fill: "完成新網路架構的測試與 ___。" },
-        { m: 1, term: "improve", def: "提升/改善：增強網路效能或安全性。", fill: "升級鏈路頻寬可以 ___ 傳輸速率。" },
-        { m: 1, term: "increase", def: "增加：提高頻寬或數量。", fill: "啟用 EtherChannel 能 ___ 鏈路總頻寬。" },
-        { m: 1, term: "Infrastructure", def: "基礎設施：伺服器、交換機、路由器與纜線等底層硬體。", fill: "網路 ___ 是企業數位化運作的基石。" },
-        { m: 1, term: "initializing", def: "初始化：設備開機或服務啟動中的初始階段。", fill: "設備正在 ___ 系統與讀取設定。" },
-        { m: 1, term: "indicated", def: "指示/顯示：狀態燈號或日誌所標示的訊息。", fill: "LED 綠燈 ___ 鏈路目前正常連線中。" },
-        { m: 1, term: "individually", def: "個別地：對各個介面或裝置獨立設定。", fill: "對每個 Port ___ 設定 Security 規則。" },
-        { m: 1, term: "interval", def: "間隔：週期性發送封包（如 Hello 封包）的時間間隔。", fill: "OSPF 預設的 Hello ___ 是 10 秒。" },
-        { m: 1, term: "invalid", def: "無效的：不合法的位址、格式或未認證的請求。", fill: "丟棄來源 IP 為 ___ 的異常封包。" },
-        { m: 1, term: "large", def: "大的：大型規模的網路或巨量封包。", fill: "企業 ___ 網路需劃分多個區域。" },
-        { m: 1, term: "location", def: "位置：設備在物理或邏輯架構上的點位。", fill: "紀錄設備置放的機架 ___。" },
-        { m: 1, term: "maintain", def: "維持/維護：保持網路服務持續穩定運作。", fill: "定期更新系統以 ___ 網路安全與穩定。" },
-        { m: 1, term: "must", def: "必須：必要條件或強制遵循的規範。", fill: "兩端介面的 Duplex 設定 ___ 保持一致。" },
-        { m: 1, term: "optimized", def: "最佳化的：經過調整後達到最佳效能的狀態。", fill: "經由優化過後的路由策略可達到 ___ 傳輸。" },
-        { m: 1, term: "original", def: "原版/原始：未經過 NAT 轉換前的原始封包。", fill: "封包在轉譯前的 ___ 標頭資訊。" },
-        { m: 1, term: "parameter", def: "參數：組態中的變數與數值設定。", fill: "修改 Timer ___ 以加速路由收斂。" },
-        { m: 1, term: "performed", def: "履行/執行：執行檢查、轉發或切換作業。", fill: "交換機已 ___ 封包過濾動作。" },
-        { m: 1, term: "possible", def: "可能的：潛在可採行的備用路徑或方案。", fill: "計算所有 ___ 到達目的地的路徑。" },
-        { m: 1, term: "preferred", def: "首選的：優先選用的路徑或介面。", fill: "設定較高優先權作為 ___ 出口。" },
-        { m: 1, term: "primarily", def: "主要地：主要使用的技術或路徑。", fill: "該 Switch ___ 用於接入層設備連接。" },
-        { m: 1, term: "properly", def: "正確地：符合規範地設定與運作。", fill: "確保纜線已 ___ 插入控制埠。" },
-        { m: 1, term: "purpose", "def": "目的：特定技術或命令設計的用意。", fill: "VLAN 的主要 ___ 是隔離廣播域。" },
-        { m: 1, term: "reachable", def: "可達的/訪問：目標 IP 可透過路由成功抵達。", fill: "確認目標主機在網絡上是 ___ 的。" },
-        { m: 1, term: "recommends", def: "建議：官方或專家推薦的最佳實踐組態。", fill: "Cisco ___ 在接入埠啟用 PortFast。" },
-        { m: 1, term: "recovering", def: "恢復：從故障狀態自我修復或還原。", fill: "系統正在從鏈路中斷中 ___。" },
-        { m: 1, term: "resources", def: "資源：CPU、記憶體與頻寬等設備資源。", fill: "監控設備 ___ 的利用率。" },
-        { m: 1, term: "response", def: "響應/回應：對請求的回覆（如 Echo Reply）。", fill: "Ping 成功收到了對端的 Ping ___。" },
-        { m: 1, term: "Requirement", def: "要求/需求：網路設計或認證所需的規範規格。", fill: "滿足高可用性網路設計的 ___。" },
-        { m: 1, term: "requires", def: "要求/需要：特定功能運行所需的具體條件。", fill: "建立 SSH 遠端連線 ___ 設定域名與金鑰。" },
-        { m: 1, term: "resiliency", def: "彈性/復原力：網路遭受打擊後快速修復的能力。", fill: "良好架構具有高度的網路 ___。" },
-        { m: 1, term: "scalability", def: "可擴展性：網路因應業務成長彈性擴充的能力。", fill: "模組化架構能大幅增強 ___。" },
-        { m: 1, term: "signal", def: "信號：在纜線或無線介質中傳輸的電磁波或光波。", fill: "衰減會導致線路 ___ 品質下降。" },
-        { m: 1, term: "specific", def: "特定的：針對特定的 IP、Port 或 VLAN。", fill: "該規則僅作用於 ___ 的流量類型。" },
-        { m: 1, term: "strength", def: "強度：訊號衰減程度或密碼安全強度。", fill: "檢查無線網路的 ___ 與覆蓋率。" },
-        { m: 1, term: "supplied", def: "提供：供應電力（如 PoE）或參數資訊。", fill: "PoE 交換機向 IP Phone ___ 電源。" },
-        { m: 1, term: "task", def: "任務：系統執行的特定工作流程。", fill: "CPU 當前正在執行的排程 ___。" },
-        { m: 1, term: "traffic", def: "流量/交通：在網路鏈路上流動的數據總量。", fill: "監控介面上的進出 ___。" },
-        { m: 1, term: "valid", def: "有效的：合法且尚未過期的路由或連線設定。", fill: "僅接受具備 ___ 簽署的證書。" },
-        { m: 1, term: "workload", def: "工作量：設備或伺服器承受的運算負載。", fill: "負載平衡器可均分伺服器的 ___。" },
-
-        // 模組二：IP 位址與子網劃分
-        { m: 2, term: "Subnet Mask", def: "子網路遮罩：用來區分 IP 位址中網路號與主機號的 32-bit 遮罩。", fill: "用來區分網路號與主機號的遮罩稱為 ___。" },
-        { m: 2, term: "CIDR", def: "無類別域間路由：如 /24，用斜線與數字表示遮罩長度的方式。", fill: "用斜線與數字表示遮罩長度的方式稱為 ___。" },
-        { m: 2, term: "Wildcard Mask", def: "萬用字元遮罩：ACL 與 OSPF 常用的反向遮罩（0 表示必須匹配）。", fill: "ACL 與 OSPF 常用的反向遮罩稱為 ___。" },
-        { m: 2, term: "Broadcast Address", def: "廣播位址：主機位元全為 1 的位址（如 192.168.1.255）。", fill: "子網中主機位元全為 1 的位址稱為 ___。" },
-        { m: 2, term: "Network Address", def: "網路位址：主機位元全為 0 的位址，代表該子網本身。", fill: "子網中主機位元全為 0 的位址稱為 ___。" },
-        { m: 2, term: "Host", def: "主機/端點：指連接至網路並配有 IP 的終端設備。", fill: "連接至網路並配有 IP 的終端設備稱為 ___。" },
-        { m: 2, term: "Loopback Address", def: "迴路位址：測試本機網路協定堆疊的位址（如 127.0.0.1）。", fill: "用來測試本機協定堆疊的位址稱為 ___。" },
-        { m: 2, term: "Default Gateway", def: "預設閘道：當設備欲傳送封包至其他子網時的預設出口 IP。", fill: "跨網段通訊時封包送往的預設出口稱為 ___。" },
-        { m: 2, term: "Unicast", def: "單播：一對一的通訊模式。", fill: "一對一傳送訊息的傳輸方式稱為 ___。" },
-        { m: 2, term: "Multicast", def: "多播/組播：一對指定的特定群組通訊（如 OSPF 224.0.0.5）。", fill: "一對特定群組主機發送訊息稱為 ___。" },
-        { m: 2, term: "Broadcast", def: "廣播：一對區域網路內所有設備的通訊（255.255.255.255）。", fill: "一對同網段所有主機發送訊息稱為 ___。" },
-        { m: 2, term: "Anycast", def: "任播：IPv6 特有，發送至距離最近的同位址群組介面。", fill: "IPv6 中發送至距離最近同位址群組的傳輸稱為 ___。" },
-        { m: 2, term: "Prefix Length", def: "前綴長度：IP 位址中子網路遮罩連續為 1 的位元數。", fill: "IP 位址中子網路遮罩連續為 1 的位元數稱為 ___。" },
-        { m: 2, term: "Summarization", def: "路由彙總：將多條連續子網路由合併為一條較簡短路由的技術。", fill: "將多條連續子網路由合併為一條的技術稱為 ___。" },
-        { m: 2, term: "Supernetting", def: "超網劃分：將多個 Class C 網路合併為一個大網路的技術。", fill: "將多個 Class C 網路合併為大網路稱為 ___。" },
-        { m: 2, term: "according", def: "根據：依據 IP 位址或子網遮罩規則進行劃分。", fill: "___ 子網遮罩長度判斷主機數量。" },
-        { m: 2, term: "assignment", def: "分配：將 IP 位址指定分配給端點設備的過程。", fill: "DHCP 伺服器進行自動 IP ___。" },
-        { m: 2, term: "binding", def: "綁定：IP 位址與 MAC 位址建立定向綁定關係。", fill: "在 DHCP 中建立 IP 與 MAC 的固定 ___。" },
-        { m: 2, term: "rebinding", def: "重新綁定：DHCP 租約即將到期時尋找任意伺服器續約。", fill: "DHCP 客戶端進入 ___ 狀態嘗試延續租約。" },
-
-        // 模組三：路由與交換
-        { m: 3, term: "Convergence", def: "收斂：拓撲變化時，所有路由器達成路由表一致狀態的過程。", fill: "所有路由器達成路由表一致狀態的過程稱為 ___。" },
-        { m: 3, term: "Metric", def: "測度/度量值：動態路由協定判斷最佳路徑的計算數值。", fill: "動態路由用來判斷最佳路徑的計算數值稱為 ___。" },
-        { m: 3, term: "Administrative Distance (AD)", def: "管理距離：路由器評估不同路由來源可信度的依據（越小越可信）。", fill: "評估不同路由來源可信度的數值稱為 ___。" },
-        { m: 3, term: "Hop Count", def: "跳數：封包到達目的端所經過的路由器數量（如 RIP 限 15 跳）。", fill: "到達目的端所經過的路由器數量稱為 ___。" },
-        { m: 3, term: "Next Hop", def: "下一跳：路由器將封包轉發出去後下一個接收的路由器 IP。", fill: "下一個接收封包的路由器 IP 稱為 ___。" },
-        { m: 3, term: "Routing Table", def: "路由表：路由器核心資料庫，紀錄目標網路與相對應介面。", fill: "路由器用來尋找最佳路徑的資料庫稱為 ___。" },
-        { m: 3, term: "Static Route", def: "靜態路由：由管理員手動設定的固定路由路徑。", fill: "手動設定的固定路由稱為 ___。" },
-        { m: 3, term: "Dynamic Routing", def: "動態路由：利用 OSPF 等協定自動學習與維護路徑。", fill: "路由器自動學習路徑的機制稱為 ___。" },
-        { m: 3, term: "Default Route", def: "預設路由：匹配所有未知目標位址的路由項（0.0.0.0/0）。", fill: "匹配所有未知目標位址的路由稱為 ___。" },
-        { m: 3, term: "Flooding", def: "氾濫/洪泛：Switch 收到未知 Unicast 幀時向所有埠（除接收埠）複製轉發。", fill: "交換機向所有 Port 複製轉發未知幀稱為 ___。" },
-        { m: 3, term: "Forwarding", def: "轉發：交換機或路由器依據表單將封包送往正確 Port 的行為。", fill: "依據表單將封包送往正確連接埠稱為 ___。" },
-        { m: 3, term: "Frame Switching", def: "幀交換：交換機依據 MAC 地址表進行二層轉發的過程。", fill: "交換機依據 MAC 地址表轉發二層資料稱為 ___。" },
-        { m: 3, term: "MAC Address Table", def: "MAC 位址表：Switch 記錄 MAC 位址與 Port 對映關係的表格。", fill: "Switch 記錄 MAC 位址與埠對映關係的表格稱為 ___。" },
-        { m: 3, term: "Trunking", def: "中繼/Trunk：允許多個 VLAN 流量共用同一條實體鏈路傳送的技術。", fill: "允許多個 VLAN 共用一條實體鏈路的技術稱為 ___。" },
-        { m: 3, term: "Native VLAN", def: "原生 VLAN：802.1Q Trunk 鏈路上唯一不打 VLAN Tag 的預設 VLAN。", fill: "Trunk 鏈路上唯一不打標籤的 VLAN 稱為 ___。" },
-        { m: 3, term: "Tagging", def: "打標籤：在二層 Header 中寫入 VLAN ID 以識別所屬 VLAN。", fill: "在二層標頭寫入 VLAN ID 的動作稱為 ___。" },
-        { m: 3, term: "Spanning Tree Protocol (STP)", def: "生成樹協定：防止二層交換網路產生廣播風暴（Loop 迴路）。", fill: "用來防止二層網路迴路的協定是 ___。" },
-        { m: 3, term: "Root Bridge", def: "根橋接器：STP 樹狀結構的邏輯核心交換機（BID 最小者）。", fill: "STP 樹狀結構中的邏輯核心交換機稱為 ___。" },
-        { m: 3, term: "Designated Port", def: "指定埠：STP 中負責向該網段轉發流量的連接埠。", fill: "STP 中負責向網段轉發流量的埠稱為 ___。" },
-        { m: 3, term: "Blocking State", def: "阻塞狀態：STP 連接埠不轉發資料幀以防迴路，但仍接收 BPDU。", fill: "STP 中不轉發資料以防止迴路的狀態稱為 ___。" },
-        { m: 3, term: "Listening State", def: "傾聽狀態：STP 準備學習 MAC 位址與轉發前的過渡狀態。", fill: "STP 準備學習 MAC 位址前的過渡狀態稱為 ___。" },
-        { m: 3, term: "Learning State", def: "學習狀態：STP 開始建構 MAC 位址表但仍不轉發資料幀的狀態。", fill: "STP 開始建構 MAC 位址表但未轉發資料的狀態稱為 ___。" },
-        { m: 3, term: "Forwarding State", def: "轉發狀態：STP 連接埠正常接收與轉發資料幀的狀態。", fill: "STP 連接埠正常接收與轉發資料的狀態稱為 ___。" },
-        { m: 3, term: "EtherChannel", def: "乙太通道：將多條實體網線綁定為單一邏輯高頻寬鏈路的技術。", fill: "將多條實體網線綁定為邏輯高頻寬鏈路稱為 ___。" },
-        { m: 3, term: "PortFast", def: "快速埠：讓終端設備連接埠跳過 Listen/Learn 直接進入 Forwarding。", fill: "讓連接埠直接進入轉發狀態的 Cisco 獨家技術稱為 ___。" },
-        { m: 3, term: "Catalyst", def: "Catalyst 系列：Cisco 企業區域網路 (Campus LAN) 交換機的主力產品線。", fill: "Cisco 用於企業區域網路 (Campus LAN) 的旗艦交換機產品線是 ___ 系列。" },
-        { m: 3, term: "Nexus", def: "Nexus 系列：Cisco 專為資料中心 (Data Center) 打造的高性能交換機產品線。", fill: "Cisco 專為資料中心 (Data Center) 設計的高效能交換機產品線是 ___ 系列。" },
-        { m: 3, term: "administrative distance", def: "管理距離：評估路由來源可信度的衡量指標（AD 越小越優先）。", fill: "直連路由的 ___ 為 0。" },
-        { m: 3, term: "aged", def: "老化：條目（如 MAC 位址表）因超時未更新而被自動清除。", fill: "MAC 地址表項超時後會發生 ___ 現象。" },
-        { m: 3, term: "analyze", def: "分析：檢視路由表與交換表項以排查異常。", fill: "___ 路由表以確認最佳轉發路徑。" },
-        { m: 3, term: "autonomous", def: "自主/獨立：獨立管理的路由區域（如 Autonomous System）。", fill: "BGP 跨越不同的 ___ 系統傳輸路由。" },
-        { m: 3, term: "best", def: "最好的：評估後最優的轉發路徑 (Best Path)。", fill: "路由器選擇 Metric 最小的作為 ___ 路徑。" },
-        { m: 3, term: "better", def: "更好的：相較之下優先級更高或開銷更低的路徑。", fill: "具備更低 AD 值的路由被視為 ___ 的選擇。" },
-        { m: 3, term: "cost", def: "開銷/成本：動態路由路徑選擇的依據數值。", fill: "OSPF 依據鏈路 ___ 來選取最佳路徑。" },
-        { m: 3, term: "designate", def: "指派：指定特定的設備擔任特定角色 (如 DR 路由器)。", fill: "在廣播網絡中 ___ 一台路由器作為 DR。" },
-        { m: 3, term: "desirable", def: "合意的/期望的：DTP 模式中主動發起中繼協商的狀態。", fill: "DTP 模式下的 ___ 狀態會主動發送 Trunk 封包。" },
-        { m: 3, term: "determine", def: "決定/判定：依據轉發表項計算封包出口。", fill: "路由器依據目標 IP ___ 下一跳出口。" },
-        { m: 3, term: "directly", def: "直接地：直接相連的實體網段 (Directly Connected)。", fill: "與路由器介面 ___ 連接的網段。" },
-        { m: 3, term: "isolate", def: "隔離：利用 VLAN 或 ACL 將故障或敏感區域隔離開來。", fill: "使用 VLAN ___ 各部門之間的廣播流量。" },
-        { m: 3, term: "migrated", def: "遷移：將舊路由協定或架構轉移切換至新系統。", fill: "網路已從 RIP ___ 至 OSPF 協定。" },
-        { m: 3, term: "modify", def: "修正/修改：變更路由開銷或介面優先級數值。", fill: "手動 ___ 介面 Cost 以導流流量。" },
-        { m: 3, term: "native", def: "原生的/本地的：Trunk 鏈路上預設不打標籤的 VLAN。", fill: "802.1Q 中的 ___ VLAN 不會帶有 VLAN Tag。" },
-        { m: 3, term: "Periodic", def: "週期性的：按固定時間間隔定期發送更新（如 RIP 定時更新）。", fill: "距離向量協定通常發送 ___ 路由更新。" },
-        { m: 3, term: "police", def: "限速/流量管制：對超額流量直接丟棄的 QoS 策略 (Policing)。", fill: "使用流量 ___ 機制丟棄超額速率的封包。" },
-
-        // 模組四：網路服務與協定
-        { m: 4, term: "Resolution", def: "解析：如 ARP（IP 解析為 MAC）或 DNS（域名解析為 IP）。", fill: "將域名或 IP 轉換對應的過程稱為 ___。" },
-        { m: 4, term: "Lease", def: "租約：DHCP 伺服器分配 IP 給客戶端使用的有效時間長度。", fill: "DHCP 分配 IP 的有效時間長度稱為 ___。" },
-        { m: 4, term: "Reservation", def: "預留：在 DHCP 伺服器中綁定特定 MAC 位址取得固定 IP。", fill: "DHCP 中綁定 MAC 位址分配固定 IP 的設定稱為 ___。" },
-        { m: 4, term: "Scope", def: "作用域：DHCP 伺服器可分配之 IP 位址範圍與參數組合。", fill: "DHCP 伺服器可分配之 IP 範圍與設定稱為 ___。" },
-        { m: 4, term: "Translation", def: "轉譯：如 NAT 將私有 IP 轉譯為公網 IP。", fill: "NAT 將私有 IP 轉為公網 IP 的過程稱為 ___。" },
-        { m: 4, term: "Overload", def: "過載 (PAT)：讓多個內網 IP 共用單一公網 IP + Port 號。", fill: "多個內網 IP 共用單一公網 IP + Port 稱為 NAT ___。" },
-        { m: 4, term: "Keepalive", def: "保活訊號：設備間定期發送的小封包，用以確認對端是否正常。", fill: "設備間用來確認鏈路或對端運作正常的小封包稱為 ___。" },
-        { m: 4, term: "Neighbor Discovery", def: "鄰居發現：如 IPv6 的 ND 協定（取代 ARP）或 CDP/LLDP。", fill: "IPv6 用來取代 ARP 並發現鄰居的機制稱為 ___。" },
-        { m: 4, term: "Adjacency", def: "鄰接關係：OSPF 路由器交換 Link-State 資訊前建立的深層關係。", fill: "OSPF 路由器交換鏈路狀態前建立的關係稱為 ___。" },
-        { m: 4, term: "Handshake", def: "握手：如 TCP 建立連線的三向握手（SYN, SYN-ACK, ACK）。", fill: "TCP 建立連線的溝通過程稱為 ___。" },
-        { m: 4, term: "Overhead", def: "額外開銷：除了傳送實際資料外額外消耗的傳輸量（如標頭）。", fill: "除了實際資料外額外消耗的傳輸開銷稱為 ___。" },
-        { m: 4, term: "Synchronization", def: "同步：傳輸雙方維持相同時序或狀態（如 TCP SYN 階段）。", fill: "傳輸雙方維持相同時序或狀態稱為 ___。" },
-        { m: 4, term: "Acknowledgment", def: "確認應答 (ACK)：接收端通知發送端已成功收到資料的回應。", fill: "接收端確認已收到資料的回應訊息稱為 ___。" },
-        { m: 4, term: "Sequence Number", def: "序號：TCP 表頭欄位，確保資料能依序重組與追蹤。", fill: "TCP 用來確保資料能依序重組的欄位稱為 ___。" },
-        { m: 4, term: "Window Size", def: "視窗大小：TCP 流量控制機制，決定回傳 ACK 前能收的最大資料量。", fill: "TCP 中決定回傳 ACK 前能接收最大資料量的機制稱為 ___。" },
-        { m: 4, term: "destination", def: "目的地：封包最終欲到達的目標 IP 或網路。", fill: "路由表依據封包的 ___ IP 進行匹配。" },
-        { m: 4, term: "name resolution", def: "名稱解析：將主機名稱或域名解析為 IP 位址的過程。", fill: "DNS 主要負責網路中的 ___ 工作。" },
-        { m: 4, term: "name resolver", def: "名稱解析器：發起 DNS 查詢請求的客戶端軟體模組。", fill: "本機的主機系統充當 ___ 向 DNS 發起查詢。" },
-        { m: 4, term: "Queries", def: "查詢：客戶端向 DNS 或資料庫發送的請求訊息。", fill: "DNS 伺服器接收並回應客戶端的 DNS ___。" },
-        { m: 4, term: "receives", def: "接收：設備或伺服器收悉封包或請求。", fill: "伺服器 ___ 客戶端的 DHCP Request 封包。" },
-        { m: 4, term: "renewing", def: "更新/續約：DHCP 客戶端向原伺服器請求延長 IP 租期。", fill: "當租期達到 50% 時客戶端會發起 ___ 流程。" },
-        { m: 4, term: "request", def: "請求：向伺服器發出的服務申請訊息。", fill: "客戶端發送 HTTP ___ 請求網頁資料。" },
-        { m: 4, term: "sequence", def: "序列/順序：TCP 表頭中的資料段順序編號。", fill: "TCP 使用 ___ Number 重新組裝亂序封包。" },
-        { m: 4, term: "stream", def: "資料流/串流：連續不間斷傳輸的數據流 (Data Stream)。", fill: "多媒體影音會在網路上建立連續 ___。" },
-
-        // 模組五：安全性與存取控制
-        { m: 5, term: "Authentication", def: "身份驗證：確認使用者或設備身份的真實性（AAA 第一個 A）。", fill: "AAA 機制中，驗證使用者身份稱為 ___。" },
-        { m: 5, term: "Authorization", def: "授權：確認已驗證身分者擁有何種權限（AAA 第二個 A）。", fill: "AAA 機制中，指定使用者存取權限稱為 ___。" },
-        { m: 5, term: "Accounting", def: "紀錄/稽核：記錄使用者在網路上所做的操作（AAA 第三個 A）。", fill: "AAA 機制中，記錄使用者操作與連線時間稱為 ___。" },
-        { m: 5, term: "Access Control List (ACL)", def: "存取控制列表：路由器上用來過濾流量（Permit/Deny）的規則。", fill: "用來過濾網路流量的規則清單簡稱 ___。" },
-        { m: 5, term: "Implicit Deny", def: "預設隱含拒絕：所有 Cisco ACL 末端預設皆有的隱藏拒絕規則。", fill: "ACL 末端預設拒絕所有未匹配流量的規則稱為 ___。" },
-        { m: 5, term: "Mitigation", def: "緩解/減輕風險：採取措施降低網路安全威脅帶來的影響。", fill: "採取措施降低安全威脅影響的過程稱為 ___。" },
-        { m: 5, term: "Vulnerability", def: "漏洞：系統或網路設計上的弱點，可能被駭客利用。", fill: "系統或網路設計上的弱點稱為 ___。" },
-        { m: 5, term: "Threat", def: "威脅：潛在可能對系統安全性造成危害的事件或人員。", fill: "可能對系統安全造成危害的潛在事件稱為 ___。" },
-        { m: 5, term: "Exploit", def: "漏洞利用程式：利用既有漏洞攻擊系統的具體手法或程式。", fill: "利用既有漏洞進行攻擊的程式或手法稱為 ___。" },
-        { m: 5, term: "Spoofing", def: "欺騙/偽造：偽造來源 IP 或 MAC 位址（如 IP Spoofing）。", fill: "偽造來源位址以進行欺騙的攻擊稱為 ___。" },
-        { m: 5, term: "Port Security", def: "連接埠安全性：交換機限定 Port 只能存取特定 MAC 位址的功能。", fill: "交換機限定 Port 只能存取特定 MAC 的安全功能稱為 ___。" },
-        { m: 5, term: "Sticky MAC Address", def: "黏性 MAC 位址：Port Security 自動將學習到的 MAC 寫入設定。", fill: "Port Security 自動將動態 MAC 鎖定寫入設定稱為 ___。" },
-        { m: 5, term: "Encryption", def: "加密：將明文資料轉換成密文以防止竊聽。", fill: "將明文轉換為密文的過程稱為 ___。" },
-        { m: 5, term: "Decryption", def: "解密：利用金鑰將密文還原成明文的過程。", fill: "將密文還原為明文的過程稱為 ___。" },
-        { m: 5, term: "Certificate", def: "數位證書：由 CA 頒發，用以驗證公開金鑰持有者身分的憑證。", fill: "由 CA 頒發用以驗證身分的電子憑證稱為 ___。" },
-        { m: 5, term: "authentication", def: "身份驗證：核對使用者帳號密碼或憑證機制。", fill: "存取設備時需先通過 ___ 檢查。" },
-        { m: 5, term: "authorization", def: "授權：依據登入身分給予對應的管理權限。", fill: "使用者通過驗證後由 RADIUS 進行 ___。" },
-        { m: 5, term: "automatically", def: "自動地：觸發安全違規時系統自動執行的動作。", fill: "違反 Port Security 時埠會 ___ 進入 shutdown 狀態。" },
-        { m: 5, term: "confidentiality", def: "機密性：資訊安全三要素 (CIA) 之一，確保資料不被非法窺探。", fill: "使用加密技術保護傳輸內容的 ___。" },
-        { m: 5, term: "encryption", def: "加密：透過演算法將資料混淆保護的安全機制。", fill: "SSH 相比 Telnet 提供了完整的流量 ___。" },
-        { m: 5, term: "filtering", def: "過濾：依據 ACL 規則允許或阻止數據流過。", fill: "防火牆進行深度的封包 ___ 作業。" },
-        { m: 5, term: "intrusion prevention system", def: "入侵防禦系統：即時檢測並主動阻斷惡意攻擊流量的設備 (IPS)。", fill: "部署 ___ 以阻斷網路入侵攻擊。" },
-        { m: 5, term: "policy", def: "政策/策略：企業定義的安全規範與存取控制原則。", fill: "實施嚴格的密碼複雜度安全 ___。" },
-        { m: 5, term: "priority", def: "優先權：QoS 或安全規則匹配的優先權順序。", fill: "優先處理具備高 ___ 的重要控制流量。" },
-        { m: 5, term: "privileged mode", def: "特權模式：Cisco CLI 中具備完整設定權限的模式 (Enable Mode)。", fill: "輸入 enable 指令進入 Cisco 的 ___。" },
-        { m: 5, term: "probe", def: "探針/主動偵測：用於探測網路主機或服務存活狀態的機制。", fill: "安全掃描器發射 ___ 封包偵測開放埠。" },
-        { m: 5, term: "proprietary", def: "專有/私有：廠商獨家擁有的私有協定或技術 (如 CDP)。", fill: "CDP 是 Cisco 獨家的 ___ 協定。" },
-
-        // 模組六：自動化、管理與除錯
-        { m: 6, term: "Provisioning", def: "佈署/配置：自動或手動安裝、設定與準備網路設備使其運作。", fill: "安裝並設定網路設備使其運作的過程稱為 ___。" },
-        { m: 6, term: "Telemetry", def: "遙測：自動遠端收集並傳輸網路設備狀態數據的技術。", fill: "自動遠端收集並傳送設備狀態數據稱為 ___。" },
-        { m: 6, term: "REST API", def: "RESTful 介面：SDN 中極常採用的 HTTP/HTTPS 標準介面。", fill: "SDN 中常用的 Web API 介面稱為 ___。" },
-        { m: 6, term: "JSON", def: "JavaScript 物件表示法：輕量級資料交換格式，常用於 REST API。", fill: "REST API 常用的輕量級資料交換格式是 ___。" },
-        { m: 6, term: "Congestion", def: "壅塞：網路流量超過介面處理能力時發生的塞車現象。", fill: "流量超過介面處理能力導致塞車稱為 ___。" },
-        { m: 6, term: "Controller", def: "控制器：SDN 架構的核心靈魂（如 Cisco DNA Center），集中管理。", fill: "SDN 架構中負責集中管理的軟體核心稱為 ___。" },
-        { m: 6, term: "Northbound Interface", def: "北向介面：控制器與上層應用程式/管理平台溝通的 API 介面。", fill: "SDN 控制器與上層應用程式溝通的介面稱為 ___。" },
-        { m: 6, term: "Southbound Interface", def: "南向介面：控制器與下方實體網路設備溝通的協定（如 OpenFlow）。", fill: "SDN 控制器與下方實體設備溝通的介面稱為 ___。" },
-        { m: 6, term: "Troubleshooting", def: "故障排除/除錯：定位、分析並解決網路問題的過程。", fill: "排查並解決網路故障的過程稱為 ___。" },
-        { m: 6, term: "Verification", def: "驗證：利用 show 或 ping 等指令確認網路配置是否成功與正常。", fill: "確認網路配置是否成功並正常的步驟稱為 ___。" },
-        { m: 6, term: "Terminal Emulator", def: "終端模擬器：用於透過 Console 埠或 SSH 連線管理 Cisco 設備 CLI 的軟體（如 PuTTY, Tera Term）。", fill: "用於連線與管理 Cisco 設備命令列 (CLI) 的軟體稱為 ___。" },
-        { m: 6, term: "capture", def: "擷取/捕獲：利用 Wireshark 等工具抓取線上封包分析 (Packet Capture)。", fill: "進行線路抓包以 ___ 異常的資料封包。" },
-        { m: 6, term: "compared", def: "比較：將當前設備輸出與基準線 (Baseline) 進行比對。", fill: "將故障發生的數據與正常備份進行 ___。" },
-        { m: 6, term: "conserve", def: "保護/節省：節約設備記憶體、CPU 資源或 IPv4 位址。", fill: "使用 NAT 技術可以 ___ 有限的公網 IP。" },
-        { m: 6, term: "controller", def: "控制器：SDN 中負責集中下發命令的核心管理組件。", fill: "透過中央 ___ 進行自動化網路設定。" },
-        { m: 6, term: "define", def: "定義：在自動化腳本或變數中指定資料與規則。", fill: "在 Ansible 腳本中 ___ 自動化任務範本。" },
-        { m: 6, term: "definition", def: "定義：策略或變數的具體說明與條文。", fill: "查看 REST API 資料結構的具體 ___。" },
-        { m: 6, term: "describes", def: "介紹/描述：日誌或文檔中說明錯誤訊息內容。", fill: "系統 Log 訊息會 ___ 錯誤發生的原因。" },
-        { m: 6, term: "enterprise", def: "企業：大型組織的企業級網路架構。", fill: "設計適合 ___ 規模的自動化維運機制。" },
-        { m: 6, term: "fact", def: "事實：故障排除時需以實際數據與現象為依據。", fill: "網路故障排除需基於客觀的 ___。" },
-        { m: 6, term: "feature", def: "特徵/功能：軟體版本所包含的特定功能模組。", fill: "該 Switch 支援的進階安全 ___。" },
-        { m: 6, term: "forgotten", def: "忘記：忘記密碼時進行密碼恢復流程 (Password Recovery)。", fill: "當 ___ 管理員密碼時可透過 Console 進行恢復。" },
-        { m: 6, term: "overloading", def: "過載：系統資源被過度耗盡或 PAT 埠資源佔滿。", fill: "過多的連線會導致路由器 CPU 發生 ___。" },
-        { m: 6, term: "overrides", def: "覆蓋：優先級高的設定覆蓋掉預設或舊有設定。", fill: "手動輸入的靜態路由會 ___ 動態學習到的路由。" },
-        { m: 6, term: "virtualization", def: "虛擬化：將實體硬體資源抽象劃分為多個虛擬機器或虛擬交換機的技術。", fill: "利用 ___ 技術在一台實體機運行多個 OS。" }
-    ];
-
-    let currentList = [];
-    let currentIndex = 0;
-    let currentMode = 'flash-ec';
-    let isShuffled = false;
-    let isStarFiltered = false;
-    let starredSet = new Set();
-    let isAnswerRevealed = false;
-
-    function speak(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = document.getElementById("accentSelect").value;
-            utterance.rate = parseFloat(document.getElementById("speedSelect").value);
-            window.speechSynthesis.speak(utterance);
-        }
+  async function loadCSV() {
+    let csvUrl = localStorage.getItem('ccna_csv_url') || DEFAULT_CSV_URL;
+    try {
+      const res = await fetch(csvUrl);
+      const text = await res.text();
+      parseCSV(text);
+    } catch(e) {
+      document.getElementById('card-main').innerText = "載入失敗，請確認雲端共用權限！";
     }
+  }
 
-    function updateList() {
-        const selectedModule = document.getElementById("moduleSelect").value;
-        
-        currentList = rawData.filter(item => {
-            const matchModule = selectedModule === 'all' || item.m == selectedModule;
-            const matchStar = !isStarFiltered || starredSet.has(item.term);
-            return matchModule && matchStar;
+  function parseCSV(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    rawCards = [];
+    for(let i=1; i<lines.length; i++) {
+      const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      if(cols.length >= 2) {
+        rawCards.push({
+          id: i,
+          term: cols[0].replace(/^"|"$/g, '').trim(),
+          meaning: cols[1].replace(/^"|"$/g, '').trim(),
+          module: cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : '1'
         });
-
-        if (isShuffled) {
-            currentList.sort(() => Math.random() - 0.5);
-        }
-        currentIndex = 0;
-        isAnswerRevealed = false;
-        render();
+      }
     }
+    filterCards();
+  }
 
-    function setMode(mode) {
-        currentMode = mode;
-        isAnswerRevealed = false;
-        document.getElementById("overviewPanel").style.display = mode === 'overview' ? 'block' : 'none';
-        document.getElementById("cardPanel").style.display = mode === 'overview' ? 'none' : 'flex';
-        document.getElementById("controlPanel").style.display = mode === 'overview' ? 'none' : 'flex';
-        render();
+  function promptSheetUrl() {
+    loadCSV();
+  }
+
+  function filterCards() {
+    const mod = document.getElementById('module-select').value;
+    filteredCards = mod === 'all' ? [...rawCards] : rawCards.filter(c => c.module === mod);
+    currentIndex = 0;
+    renderCard();
+  }
+
+  function renderCard() {
+    if(!filteredCards.length) return;
+    const card = filteredCards[currentIndex];
+    const mainEl = document.getElementById('card-main');
+    const subEl = document.getElementById('card-sub');
+    const starIcon = document.getElementById('star-icon');
+
+    document.getElementById('card-count').innerText = `卡片：${currentIndex + 1} / ${filteredCards.length}`;
+    starIcon.classList.toggle('starred', starredIds.has(card.id));
+    isFlipped = false;
+
+    if (currentMode === 'card-en') {
+      mainEl.innerText = card.term;
+      subEl.innerText = card.meaning;
+      subEl.style.display = 'none';
+    } else if (currentMode === 'card-zh') {
+      mainEl.innerText = card.meaning;
+      subEl.innerText = card.term;
+      subEl.style.display = 'none';
+    } else if (currentMode === 'listen') {
+      mainEl.innerText = "🎧 點擊聽發音";
+      subEl.innerText = `${card.term}\n${card.meaning}`;
+      subEl.style.display = 'none';
+      speakText(card.term);
     }
+  }
 
-    function toggleShuffle() {
-        isShuffled = !isShuffled;
-        document.getElementById("shuffleBtn").innerText = `🔀 隨機洗牌：${isShuffled ? '開啟' : '關閉'}`;
-        updateList();
+  function flipCard() {
+    const subEl = document.getElementById('card-sub');
+    if (currentMode !== 'list') {
+      isFlipped = !isFlipped;
+      subEl.style.display = isFlipped ? 'block' : 'none';
     }
+  }
 
-    function toggleStarFilter() {
-        isStarFiltered = !isStarFiltered;
-        document.getElementById("starFilterBtn").innerText = `⭐ 只複習星號：${isStarFiltered ? '開啟' : '關閉'}`;
-        updateList();
-    }
+  function nextCard() { if(currentIndex < filteredCards.length - 1) { currentIndex++; renderCard(); } }
+  function prevCard() { if(currentIndex > 0) { currentIndex--; renderCard(); } }
 
-    function toggleStar() {
-        if (currentList.length === 0) return;
-        const term = currentList[currentIndex].term;
-        if (starredSet.has(term)) starredSet.delete(term);
-        else starredSet.add(term);
-        render();
-    }
+  function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    document.getElementById('card-box').style.display = mode === 'list' ? 'none' : 'block';
+    document.getElementById('nav-controls').style.display = mode === 'list' ? 'none' : 'flex';
+    document.getElementById('full-list').style.display = mode === 'list' ? 'block' : 'none';
 
-    function render() {
-        if (currentMode === 'overview') {
-            const listHtml = currentList.map(item => `
-                <div class="overview-item">
-                    <div>
-                        <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:10px;">${moduleNames[item.m]}</span>
-                        <strong>${item.term}</strong><br>
-                        <small style="color:#555;">${item.def}</small>
-                    </div>
-                    <span style="cursor:pointer; font-size:18px;" onclick="speak('${item.term}')">🔊</span>
-                </div>
-            `).join('');
-            document.getElementById("overviewPanel").innerHTML = listHtml || "<div style='text-align:center; padding:20px;'>無符合條件資料</div>";
-            return;
-        }
+    if(mode === 'list') renderList(); else renderCard();
+  }
 
-        const progress = document.getElementById("progressText");
-        const termText = document.getElementById("termText");
-        const defText = document.getElementById("defText");
-        const starBtn = document.getElementById("starBtn");
-        const badge = document.getElementById("cardModuleBadge");
+  function renderList() {
+    const listEl = document.getElementById('full-list');
+    listEl.innerHTML = filteredCards.map(c => `
+      <div class="list-item">
+        <div><strong>${c.term}</strong><br><small>${c.meaning}</small></div>
+        <button onclick="speakText('${c.term}')">🔊</button>
+      </div>
+    `).join('');
+  }
 
-        if (currentList.length === 0) {
-            badge.innerText = "提示";
-            termText.innerText = "無符合條件單字";
-            defText.innerText = "請嘗試切換課程或關閉星號篩選";
-            progress.innerText = "0 / 0";
-            starBtn.style.display = "none";
-            return;
-        }
+  function speakCurrent(e) {
+    e.stopPropagation();
+    if(filteredCards[currentIndex]) speakText(filteredCards[currentIndex].term);
+  }
 
-        starBtn.style.display = "block";
-        const item = currentList[currentIndex];
-        badge.innerText = moduleNames[item.m];
-        progress.innerText = `${currentIndex + 1} / ${currentList.length}`;
-        starBtn.className = `star-icon ${starredSet.has(item.term) ? 'active' : ''}`;
+  function speakText(text) {
+    const synth = window.speechSynthesis;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = document.getElementById('voice-select').value;
+    utter.rate = parseFloat(document.getElementById('speed-select').value);
+    synth.speak(utter);
+  }
 
-        if (currentMode === 'flash-ec') {
-            termText.innerHTML = `${item.term} <span class="audio-play" onclick="speak('${item.term}')">🔊</span>`;
-            defText.innerText = isAnswerRevealed ? item.def : "（點擊卡片顯示中文解釋）";
-        } else if (currentMode === 'flash-ce') {
-            termText.innerText = item.def;
-            defText.innerHTML = isAnswerRevealed ? `${item.term} <span class="audio-play" onclick="speak('${item.term}')">🔊</span>` : "（點擊卡片顯示英文單字）";
-        } else if (currentMode === 'listen') {
-            termText.innerHTML = `<button class="btn btn-listen" onclick="speak('${item.term}')">🎧 點擊播放發音</button>`;
-            defText.innerHTML = isAnswerRevealed ? `<strong>${item.term}</strong><br>${item.def}` : "（聽音後點擊顯示答案）";
-        } else if (currentMode === 'type') {
-            termText.innerHTML = `<button class="btn btn-type" onclick="speak('${item.term}')">🎧 點擊播放發音</button>`;
-            defText.innerHTML = `
-                <input type="text" id="userInput" class="input-box" placeholder="請輸入聽到的英文" onkeyup="checkAnswer(event)">
-                <div id="typeFeedback" style="margin-top:8px;"></div>
-            `;
-            if (!isAnswerRevealed) speak(item.term);
-        } else if (currentMode === 'fill') {
-            termText.innerText = item.fill;
-            defText.innerHTML = isAnswerRevealed ? `答案：<strong>${item.term}</strong><br>${item.def}` : "（點擊顯示答案）";
-        }
-    }
+  function toggleStar(e) {
+    e.stopPropagation();
+    const card = filteredCards[currentIndex];
+    if(starredIds.has(card.id)) starredIds.delete(card.id);
+    else starredIds.add(card.id);
+    localStorage.setItem('ccna_stars', JSON.stringify([...starredIds]));
+    renderCard();
+  }
 
-    function checkAnswer(e) {
-        if (e.key === 'Enter') {
-            const val = document.getElementById("userInput").value.trim().toLowerCase();
-            const correct = currentList[currentIndex].term.toLowerCase();
-            const feedback = document.getElementById("typeFeedback");
-            if (val === correct) {
-                feedback.innerHTML = "<span style='color:green; font-weight:bold;'>✅ 正確！</span>";
-            } else {
-                feedback.innerHTML = `<span style='color:red; font-weight:bold;'>❌ 錯誤！正確答案：${currentList[currentIndex].term}</span>`;
-            }
-        }
-    }
-
-    document.getElementById("cardPanel").addEventListener("click", (e) => {
-        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && !e.target.classList.contains('star-icon') && !e.target.classList.contains('audio-play')) {
-            isAnswerRevealed = !isAnswerRevealed;
-            render();
-        }
-    });
-
-    function nextCard() {
-        if (currentList.length === 0) return;
-        currentIndex = (currentIndex + 1) % currentList.length;
-        isAnswerRevealed = false;
-        render();
-    }
-
-    function prevCard() {
-        if (currentList.length === 0) return;
-        currentIndex = (currentIndex - 1 + currentList.length) % currentList.length;
-        isAnswerRevealed = false;
-        render();
-    }
-
-    // 初始化載入
-    updateList();
+  window.onload = loadCSV;
 </script>
 </body>
 </html>
