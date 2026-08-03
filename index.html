@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CCNA 互動單字卡 (全功能版)</title>
+  <title>CCNA 互動單字卡</title>
   <style>
     :root {
       --primary: #5c9ead;
@@ -12,24 +12,23 @@
       --card-bg: #ffffff;
       --text: #2c3e50;
       --accent: #e08283;
-      --btn-active: #4a7c89;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
     header { width: 100%; max-width: 600px; text-align: center; margin-bottom: 12px; }
-    h1 { font-size: 1.5rem; color: #376370; margin-bottom: 5px; }
+    h1 { font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 5px; }
     
     .status-bar { font-size: 0.85rem; color: #555; display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 8px 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 10px; width: 100%; max-width: 600px; }
-    .btn-sheet { background: #376370; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+    .btn-sheet { background: var(--primary-dark); color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
 
     .controls { width: 100%; max-width: 600px; background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
-    .control-group { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; }
-    select { padding: 5px 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; font-size: 0.85rem; }
+    .control-group { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; width: 100%; }
+    .control-group-half { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; }
+    select { padding: 6px 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; font-size: 0.85rem; width: 100%; }
 
     .menu-grid { width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
     .mode-btn, .toggle-btn { width: 100%; padding: 10px; font-size: 0.9rem; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; color: white; }
     
-    /* 模式按鈕色彩比照舊版設計 */
     .btn-list { background-color: #6a9c89; }
     .btn-listen-flip { background-color: #d98880; }
     .btn-listen-key { background-color: #85a3c2; }
@@ -38,11 +37,11 @@
     .btn-cloze { background-color: #b5a2ca; }
     .btn-toggle { background-color: #dfd8c8; color: #4a4a4a; border: 1px solid #ccc; }
     .btn-toggle.active { background-color: #cbb89d; color: #000; font-weight: bolder; }
-    .mode-btn.active-mode { outline: 3px solid #376370; transform: scale(0.99); }
+    .mode-btn.active-mode { outline: 3px solid var(--primary-dark); transform: scale(0.99); }
 
     .card-container { width: 100%; max-width: 600px; min-height: 220px; perspective: 1000px; margin-bottom: 15px; }
     .card { width: 100%; min-height: 220px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; position: relative; cursor: pointer; }
-    .card .module-badge { position: absolute; top: 12px; left: 12px; font-size: 0.75rem; background: #eef2f5; padding: 2px 8px; border-radius: 12px; color: #666; }
+    .card .module-badge { position: absolute; top: 12px; left: 12px; font-size: 0.75rem; background: #eef2f5; padding: 3px 10px; border-radius: 12px; color: var(--primary-dark); font-weight: bold; }
     .card .term { font-size: 1.6rem; font-weight: bold; color: var(--primary-dark); margin: 10px 0; word-break: break-word; }
     .card .meaning { font-size: 1rem; line-height: 1.5; color: #4a5568; margin-top: 5px; }
     .star-btn { position: absolute; top: 12px; right: 12px; font-size: 1.5rem; color: #ccc; cursor: pointer; border: none; background: none; }
@@ -77,36 +76,39 @@
   </div>
 
   <div class="controls">
-    <div class="control-group">
-      <label>口音:</label>
-      <select id="voice-select">
-        <option value="en-US">美音 US</option>
-        <option value="en-GB">英音 UK</option>
-      </select>
+    <div style="display: flex; gap: 10px; width: 100%; margin-bottom: 6px;">
+      <div class="control-group-half" style="flex:1;">
+        <label style="white-space:nowrap;">口音:</label>
+        <select id="voice-select">
+          <option value="en-US">美音 US</option>
+          <option value="en-GB">英音 UK</option>
+        </select>
+      </div>
+      <div class="control-group-half" style="flex:1;">
+        <label style="white-space:nowrap;">語速:</label>
+        <select id="speed-select">
+          <option value="0.75">0.75x</option>
+          <option value="1.0" selected>1.0x</option>
+          <option value="1.25">1.25x</option>
+        </select>
+      </div>
     </div>
+
+    <!-- 模組選單（已升級為中文） -->
     <div class="control-group">
-      <label>語速:</label>
-      <select id="speed-select">
-        <option value="0.75">0.75x</option>
-        <option value="1.0" selected>1.0x</option>
-        <option value="1.25">1.25x</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label>模組:</label>
+      <label style="white-space:nowrap;">模組:</label>
       <select id="module-select" onchange="updateWorkingList()">
-        <option value="all">全部模組</option>
-        <option value="1">模組 1</option>
-        <option value="2">模組 2</option>
-        <option value="3">模組 3</option>
-        <option value="4">模組 4</option>
-        <option value="5">模組 5</option>
-        <option value="6">模組 6</option>
+        <option value="all">全部模組 (所有單字)</option>
+        <option value="1">模組 1：網路基礎與拓撲</option>
+        <option value="2">模組 2：IP 定址與子網劃分</option>
+        <option value="3">模組 3：路由與交換架構</option>
+        <option value="4">模組 4：網路服務與協定</option>
+        <option value="5">模組 5：資訊安全與存取控制</option>
+        <option value="6">模組 6：網路自動化與維運除錯</option>
       </select>
     </div>
   </div>
 
-  <!-- 功能選單清單（比照舊版完全一致） -->
   <div class="menu-grid">
     <button class="mode-btn btn-list" onclick="setMode('list')">📖 全覽</button>
     <button class="mode-btn btn-listen-flip" onclick="setMode('listen-flip')">👀 翻牌聽寫</button>
@@ -119,7 +121,6 @@
     <button class="toggle-btn btn-toggle" id="star-filter-btn" onclick="toggleStarFilter()">⭐ 只複習星號：關閉</button>
   </div>
 
-  <!-- 卡片主體區塊 -->
   <div class="card-container" id="card-box">
     <div class="card" onclick="handleCardClick()">
       <span class="module-badge" id="card-module">模組 -</span>
@@ -137,10 +138,8 @@
     </div>
   </div>
 
-  <!-- 全覽列表區塊 -->
   <div class="full-list" id="full-list"></div>
 
-  <!-- 上一張 / 下一張 導覽列 -->
   <div class="nav-btns" id="nav-controls">
     <button class="nav-btn" onclick="prevCard()" id="prev-btn">上一張</button>
     <button class="nav-btn" onclick="nextCard()" id="next-btn">下一張</button>
@@ -149,6 +148,15 @@
 <script>
   const CSV_URL = "https://docs.google.com/spreadsheets/d/138QBsvjZAgtx2WNDGyC2XJTgscV-4SOwYupGX44cXYU/export?format=csv";
   
+  const MODULE_NAMES = {
+    '1': '模組 1：網路基礎與拓撲',
+    '2': '模組 2：IP 定址與子網劃分',
+    '3': '模組 3：路由與交換架構',
+    '4': '模組 4：網路服務與協定',
+    '5': '模組 5：資訊安全與存取控制',
+    '6': '模組 6：網路自動化與維運除錯'
+  };
+
   let rawCards = [];
   let workingCards = [];
   let currentIndex = 0;
@@ -223,13 +231,13 @@
       mainEl.innerText = "沒有符合條件的單字";
       subEl.style.display = 'none';
       inputArea.style.display = 'none';
-      moduleEl.innerText = "模組 -";
+      moduleEl.innerText = "無資料";
       return;
     }
 
     const card = workingCards[currentIndex];
     document.getElementById('card-count').innerText = `卡片：${currentIndex + 1} / ${workingCards.length}`;
-    moduleEl.innerText = `模組 ${card.module}`;
+    moduleEl.innerText = MODULE_NAMES[card.module] || `模組 ${card.module}`;
     starIcon.classList.toggle('starred', starredIds.has(card.id));
 
     if (currentMode === 'card-en') {
@@ -329,7 +337,7 @@
     const listEl = document.getElementById('full-list');
     listEl.innerHTML = workingCards.map(c => `
       <div class="list-item">
-        <div><strong>${c.term}</strong><br><small>${c.meaning}</small></div>
+        <div><strong>${c.term}</strong> <small style="color:#888;">(${MODULE_NAMES[c.module] || '模組' + c.module})</small><br><small>${c.meaning}</small></div>
         <button onclick="speakText('${c.term}')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">🔊</button>
       </div>
     `).join('');
