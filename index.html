@@ -42,8 +42,8 @@
     .card-container { width: 100%; max-width: 600px; min-height: 220px; perspective: 1000px; margin-bottom: 15px; }
     .card { width: 100%; min-height: 220px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; position: relative; cursor: pointer; }
     .card .module-badge { position: absolute; top: 12px; left: 12px; font-size: 0.75rem; background: #eef2f5; padding: 3px 10px; border-radius: 12px; color: var(--primary-dark); font-weight: bold; }
-    .card .term { font-size: 1.6rem; font-weight: bold; color: var(--primary-dark); margin: 10px 0; word-break: break-word; }
-    .card .meaning { font-size: 1rem; line-height: 1.5; color: #4a5568; margin-top: 5px; }
+    .card .term { font-size: 1.35rem; font-weight: bold; color: var(--primary-dark); margin: 10px 0; word-break: break-word; }
+    .card .meaning { font-size: 0.95rem; line-height: 1.6; color: #4a5568; margin-top: 5px; white-space: pre-line; text-align: left; width: 100%; max-width: 520px; }
     .star-btn { position: absolute; top: 12px; right: 12px; font-size: 1.5rem; color: #ccc; cursor: pointer; border: none; background: none; }
     .star-btn.starred { color: #f39c12; }
     .audio-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; margin-bottom: 5px; }
@@ -61,12 +61,13 @@
 
     .full-list { width: 100%; max-width: 600px; background: white; border-radius: 10px; padding: 15px; max-height: 500px; overflow-y: auto; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .list-item { padding: 10px 0; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+    .list-item-meaning { font-size: 0.85rem; color: #555; white-space: pre-line; margin-top: 4px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>CCNA 英文單字卡</h1>
+    <h1>CCNA 互動單字卡</h1>
   </header>
 
   <div class="status-bar">
@@ -129,7 +130,7 @@
       <div class="meaning" id="card-sub" style="display:none;"></div>
 
       <div class="input-container" id="input-area" style="display:none;" onclick="event.stopPropagation()">
-        <input type="text" class="input-box" id="user-input" placeholder="請輸入英文單字..." onkeypress="handleKeyPress(event)">
+        <input type="text" class="input-box" id="user-input" placeholder="請輸入答案..." onkeypress="handleKeyPress(event)">
         <button class="check-btn" onclick="checkAnswer()">對答案</button>
         <div class="feedback" id="feedback-msg"></div>
       </div>
@@ -155,6 +156,63 @@
     '6': '模組 6：網路自動化與維運除錯'
   };
 
+  // 匯入觀念卡 1~5（含 Q&A 與 Anki 填空題型）
+  const customCards = [
+    // --- 觀念 Q&A 閃卡 ---
+    {
+      term: "【卡片 1：單位與術語】bit per second (bps) 中的 \"per\" 是什麼意思？",
+      meaning: "介系詞，意思是「每」或「每一」（相當於斜線 / 或除以）。\nbps 代表每秒傳輸的位元數 (bits/second)。",
+      module: "1"
+    },
+    {
+      term: "【卡片 2：觀念區分】請簡述廣域網（WAN）架構中 DTE、DCE 與 NIC 的角色差異？",
+      meaning: "• DTE（數據終端設備）：資料起點/終點（如：PC、路由器）。\n• DCE（數據通訊設備）：負責訊號轉換與提供時鐘同步 (Clock Rate)（如：Modem、CSU/DSU）。\n• NIC（網路介面卡）：存在於 DTE 設備內部的實體網卡模組。",
+      module: "1"
+    },
+    {
+      term: "【卡片 3：現代應用】現代網路中還在使用 DCE 嗎？請舉例說明。",
+      meaning: "有！雖然傳統 Serial DCE 少見，但「DCE 的角色」無所不在。\n例如：家中的 ONU（光纖數據機/光貓）就是 DCE，它接收光訊號、轉換成電訊號，並提供時鐘同步給路由器的 WAN 埠。",
+      module: "1"
+    },
+    {
+      term: "【卡片 4：CCNA 實作題】在實驗室使用 Serial 背對背纜線連接兩台路由器時，哪一端需要手動設定 clock rate？",
+      meaning: "DCE 端（母頭）。因為 DCE 的核心職責就是提供時鐘訊號同步。",
+      module: "1"
+    },
+    {
+      term: "【卡片 5：實體介面比較】DCE 與 NIC 的實體介面接頭一定是 RJ-45 嗎？",
+      meaning: "不一定！\n• NIC：絕大多數是 RJ-45（高階有 SFP/光纖）。\n• 傳統 DCE：V.35 / DB-60 / Smart Serial（非 RJ-45）。\n• 專線 CSU/DSU：RJ-48（外觀像 RJ-45 但腳位與屏蔽不同）。\n• 現代 DCE (ONU)：SC/APC 光纖接口 + RJ-45 乙太網孔。",
+      module: "1"
+    },
+
+    // --- Anki 填空題卡片 (Cloze Deletion) ---
+    {
+      term: "每",
+      meaning: "【填空題 1】bit per second (bps) 中的 \"per\" 代表 {{每 / 每一}} 的意思，即每秒傳輸的位元數。",
+      module: "1"
+    },
+    {
+      term: "DCE",
+      meaning: "【填空題 2】在 WAN 架構中，負責提供訊號轉換與 {{時鐘同步 (Clock Rate)}} 的設備稱為 {{DCE}}。",
+      module: "1"
+    },
+    {
+      term: "DTE",
+      meaning: "【填空題 3】廣域網中作為資料起點或終點的設備（如路由器）稱為 {{DTE}}，而內部的網卡模組稱為 {{NIC}}。",
+      module: "1"
+    },
+    {
+      term: "ONU",
+      meaning: "【填空題 4】現代家中的光纖數據機（{{ONU}}）在架構上扮演的是 {{DCE}} 設備的角色。",
+      module: "1"
+    },
+    {
+      term: "RJ-48",
+      meaning: "【填空題 5】傳統專線 DCE 使用的介面為 {{V.35 / Smart Serial}}，專線 CSU/DSU 使用 {{RJ-48}}，而現代 ONU 光纖介面常為 {{SC/APC}}。",
+      module: "1"
+    }
+  ];
+
   let rawCards = [];
   let workingCards = [];
   let currentIndex = 0;
@@ -171,24 +229,35 @@
       const text = await res.text();
       parseCSV(text);
     } catch(e) {
-      document.getElementById('card-main').innerText = "載入失敗，請確認網路連線！";
+      rawCards = customCards.map((c, idx) => ({ id: idx + 1000, ...c }));
+      updateWorkingList();
     }
   }
 
   function parseCSV(text) {
     const lines = text.split('\n').map(l => l.trim()).filter(l => l);
     rawCards = [];
+    let idCounter = 1;
+
     for(let i=1; i<lines.length; i++) {
       const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
       if(cols.length >= 2) {
         rawCards.push({
-          id: i,
+          id: idCounter++,
           term: cols[0].replace(/^"|"$/g, '').trim(),
           meaning: cols[1].replace(/^"|"$/g, '').trim(),
           module: cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : '1'
         });
       }
     }
+
+    customCards.forEach(card => {
+      rawCards.push({
+        id: idCounter++,
+        ...card
+      });
+    });
+
     updateWorkingList();
   }
 
@@ -250,13 +319,13 @@
       inputArea.style.display = 'none';
     } else if (currentMode === 'listen-flip') {
       mainEl.innerText = "🎧 點擊聽發音";
-      subEl.innerText = `${card.term}\n${card.meaning}`;
+      subEl.innerText = `${card.term}\n\n${card.meaning}`;
       subEl.style.display = 'none';
       inputArea.style.display = 'none';
       speakText(card.term);
     } else if (currentMode === 'listen-key') {
       mainEl.innerText = "🎧 點擊播放發音";
-      subEl.innerText = `${card.term}\n${card.meaning}`;
+      subEl.innerText = `${card.term}\n\n${card.meaning}`;
       subEl.style.display = 'none';
       inputArea.style.display = 'flex';
       speakText(card.term);
@@ -283,7 +352,7 @@
     const feedback = document.getElementById('feedback-msg');
     const subEl = document.getElementById('card-sub');
 
-    if (val === ans) {
+    if (val === ans || ans.includes(val) && val.length > 0) {
       feedback.innerText = "✅ 正確！";
       feedback.className = "feedback correct";
       subEl.style.display = 'block';
@@ -300,13 +369,12 @@
     }
   }
 
-  // 循環輪迴切換上一張與下一張
   function nextCard() {
     if (!workingCards.length) return;
     if (currentIndex < workingCards.length - 1) {
       currentIndex++;
     } else {
-      currentIndex = 0; // 循環回到第一張
+      currentIndex = 0;
     }
     renderCard();
   }
@@ -316,7 +384,7 @@
     if (currentIndex > 0) {
       currentIndex--;
     } else {
-      currentIndex = workingCards.length - 1; // 循環回到最後一張
+      currentIndex = workingCards.length - 1;
     }
     renderCard();
   }
@@ -353,8 +421,12 @@
     const listEl = document.getElementById('full-list');
     listEl.innerHTML = workingCards.map(c => `
       <div class="list-item">
-        <div><strong>${c.term}</strong> <small style="color:#888;">(${MODULE_NAMES[c.module] || '模組' + c.module})</small><br><small>${c.meaning}</small></div>
-        <button onclick="speakText('${c.term}')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">🔊</button>
+        <div>
+          <strong>${c.term}</strong> 
+          <small style="color:#888;">(${MODULE_NAMES[c.module] || '模組' + c.module})</small>
+          <div class="list-item-meaning">${c.meaning}</div>
+        </div>
+        <button onclick="speakText('${c.term.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">🔊</button>
       </div>
     `).join('');
   }
