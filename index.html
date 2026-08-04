@@ -97,14 +97,27 @@
     <div class="control-group">
       <label style="white-space:nowrap;">分類:</label>
       <select id="module-select" onchange="updateWorkingList()">
-        <option value="all">全部單字與卡片 (All)</option>
-        <option value="1">模組 1：網路基礎與拓撲</option>
-        <option value="2">模組 2：IP 定址與子網劃分</option>
-        <option value="3">模組 3：路由與交換架構</option>
-        <option value="4">模組 4：網路服務與協定</option>
-        <option value="5">模組 5：資訊安全與存取控制</option>
-        <option value="6">模組 6：網路自動化與維運除錯</option>
-        <option value="qa">💡 Q&A 觀念問答卡 (卡片 1~5)</option>
+        <option value="all">🌐 全部內容 (所有單字與觀念卡)</option>
+
+        <!-- 獨立區域一：英文單字模組 (1~6) -->
+        <optgroup label="📚 英文單字模組">
+          <option value="1">模組 1：網路基礎與拓撲</option>
+          <option value="2">模組 2：IP 定址與子網劃分</option>
+          <option value="3">模組 3：路由與交換架構</option>
+          <option value="4">模組 4：網路服務與協定</option>
+          <option value="5">模組 5：資訊安全與存取控制</option>
+          <option value="6">模組 6：網路自動化與維運除錯</option>
+        </optgroup>
+
+        <!-- 獨立區域二：Q&A 觀念問答卡 (卡片 1~5) -->
+        <optgroup label="💡 Q&A 觀念問答卡">
+          <option value="qa-all">所有 Q&A 卡片 (1~5)</option>
+          <option value="qa-1">【卡片 1】單位與術語 (bps / per)</option>
+          <option value="qa-2">【卡片 2】觀念區分 (DTE / DCE / NIC)</option>
+          <option value="qa-3">【卡片 3】現代應用 (ONU / Modem)</option>
+          <option value="qa-4">【卡片 4】CCNA 實作題 (clock rate)</option>
+          <option value="qa-5">【卡片 5】實體介面比較 (RJ-45 / V.35 / RJ-48)</option>
+        </optgroup>
       </select>
     </div>
   </div>
@@ -155,12 +168,17 @@
     '4': '模組 4：網路服務與協定',
     '5': '模組 5：資訊安全與存取控制',
     '6': '模組 6：網路自動化與維運除錯',
-    'qa': '💡 Q&A 觀念問答卡'
+    'qa-all': '💡 Q&A 觀念問答卡 (全部)',
+    'qa-1': '💡 Q&A 卡片 1',
+    'qa-2': '💡 Q&A 卡片 2',
+    'qa-3': '💡 Q&A 卡片 3',
+    'qa-4': '💡 Q&A 卡片 4',
+    'qa-5': '💡 Q&A 卡片 5'
   };
 
   const customCards = [
     // ==========================================
-    // 模組 1：英文單字與專有名詞 (Module 1 Words)
+    // 英文單字（歸類於 模組 1）
     // ==========================================
     {
       term: "ADSL",
@@ -224,32 +242,32 @@
     },
 
     // ==========================================
-    // 獨立類別：Q&A 觀念問答卡 (Module qa)
+    // Q&A 觀念問答卡（獨立選單，可選卡片 1~5）
     // ==========================================
     {
       term: "【卡片 1：單位與術語】bit per second (bps) 中的 \"per\" 是什麼意思？",
       meaning: "介系詞，意思是「每」或「每一」（相當於斜線 / 或除以）。\nbps 代表每秒傳輸的位元數 (bits/second)。",
-      module: "qa"
+      module: "qa-1"
     },
     {
       term: "【卡片 2：觀念區分】請簡述廣域網（WAN）架構中 DTE、DCE 與 NIC 的角色差異？",
       meaning: "• DTE（數據終端設備）：資料起點/終點（如：PC、路由器）。\n• DCE（數據通訊設備）：負責訊號轉換與提供時鐘同步 (Clock Rate)（如：Modem、CSU/DSU）。\n• NIC（網路介面卡）：存在於 DTE 設備內部的實體網卡模組。",
-      module: "qa"
+      module: "qa-2"
     },
     {
       term: "【卡片 3：現代應用】現代網路中還在使用 DCE 嗎？請舉例說明。",
       meaning: "有！雖然傳統 Serial DCE 少見，但「DCE 的角色」無所不在。\n例如：家中的 ONU（光纖數據機/光貓）就是 DCE，它接收光訊號、轉換成電訊號，並提供時鐘同步給路由器的 WAN 埠。",
-      module: "qa"
+      module: "qa-3"
     },
     {
       term: "【卡片 4：CCNA 實作題】在實驗室使用 Serial 背對背纜線連接兩台路由器時，哪一端需要手動設定 clock rate？",
       meaning: "DCE 端（母頭）。因為 DCE 的核心職責就是提供時鐘訊號同步。",
-      module: "qa"
+      module: "qa-4"
     },
     {
       term: "【卡片 5：實體介面比較】DCE 與 NIC 的實體介面接頭一定是 RJ-45 嗎？",
       meaning: "不一定！\n• NIC：絕大多數是 RJ-45（高階有 SFP/光纖）。\n• 傳統 DCE：V.35 / DB-60 / Smart Serial（非 RJ-45）。\n• 專線 CSU/DSU：RJ-48（外觀像 RJ-45 但腳位與屏蔽不同）。\n• 現代 DCE (ONU)：SC/APC 光纖接口 + RJ-45 乙太網孔。",
-      module: "qa"
+      module: "qa-5"
     }
   ];
 
@@ -306,8 +324,14 @@
     let list = [...rawCards];
 
     if (mod !== 'all') {
-      list = list.filter(c => c.module === mod);
+      if (mod === 'qa-all') {
+        // 選擇「所有 Q&A 卡片」時，過濾出所有 qa- 開頭的卡片
+        list = list.filter(c => c.module && c.module.startsWith('qa-'));
+      } else {
+        list = list.filter(c => c.module === mod);
+      }
     }
+
     if (isStarOnly) {
       list = list.filter(c => starredIds.has(c.id));
     }
