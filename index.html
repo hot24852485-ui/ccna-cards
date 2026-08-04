@@ -95,15 +95,16 @@
     </div>
 
     <div class="control-group">
-      <label style="white-space:nowrap;">模組:</label>
+      <label style="white-space:nowrap;">分類:</label>
       <select id="module-select" onchange="updateWorkingList()">
-        <option value="all">全部模組 (所有單字)</option>
+        <option value="all">全部單字與卡片 (All)</option>
         <option value="1">模組 1：網路基礎與拓撲</option>
         <option value="2">模組 2：IP 定址與子網劃分</option>
         <option value="3">模組 3：路由與交換架構</option>
         <option value="4">模組 4：網路服務與協定</option>
         <option value="5">模組 5：資訊安全與存取控制</option>
         <option value="6">模組 6：網路自動化與維運除錯</option>
+        <option value="qa">💡 Q&A 觀念問答卡 (卡片 1~5)</option>
       </select>
     </div>
   </div>
@@ -153,63 +154,102 @@
     '3': '模組 3：路由與交換架構',
     '4': '模組 4：網路服務與協定',
     '5': '模組 5：資訊安全與存取控制',
-    '6': '模組 6：網路自動化與維運除錯'
+    '6': '模組 6：網路自動化與維運除錯',
+    'qa': '💡 Q&A 觀念問答卡'
   };
 
-  // 匯入觀念卡 1~5（含 Q&A 與 Anki 填空題型）
   const customCards = [
-    // --- 觀念 Q&A 閃卡 ---
+    // ==========================================
+    // 模組 1：英文單字與專有名詞 (Module 1 Words)
+    // ==========================================
     {
-      term: "【卡片 1：單位與術語】bit per second (bps) 中的 \"per\" 是什麼意思？",
-      meaning: "介系詞，意思是「每」或「每一」（相當於斜線 / 或除以）。\nbps 代表每秒傳輸的位元數 (bits/second)。",
+      term: "ADSL",
+      meaning: "Asymmetric Digital Subscriber Line（非對稱數位用戶線路）\n下行頻寬大於上行的數位用戶線路技術。",
       module: "1"
     },
     {
-      term: "【卡片 2：觀念區分】請簡述廣域網（WAN）架構中 DTE、DCE 與 NIC 的角色差異？",
-      meaning: "• DTE（數據終端設備）：資料起點/終點（如：PC、路由器）。\n• DCE（數據通訊設備）：負責訊號轉換與提供時鐘同步 (Clock Rate)（如：Modem、CSU/DSU）。\n• NIC（網路介面卡）：存在於 DTE 設備內部的實體網卡模組。",
+      term: "FTTH",
+      meaning: "Fiber To The Home（光纖到府）\n光纖直接鋪設至用戶家中的高速寬頻架構。",
       module: "1"
     },
     {
-      term: "【卡片 3：現代應用】現代網路中還在使用 DCE 嗎？請舉例說明。",
-      meaning: "有！雖然傳統 Serial DCE 少見，但「DCE 的角色」無所不在。\n例如：家中的 ONU（光纖數據機/光貓）就是 DCE，它接收光訊號、轉換成電訊號，並提供時鐘同步給路由器的 WAN 埠。",
-      module: "1"
-    },
-    {
-      term: "【卡片 4：CCNA 實作題】在實驗室使用 Serial 背對背纜線連接兩台路由器時，哪一端需要手動設定 clock rate？",
-      meaning: "DCE 端（母頭）。因為 DCE 的核心職責就是提供時鐘訊號同步。",
-      module: "1"
-    },
-    {
-      term: "【卡片 5：實體介面比較】DCE 與 NIC 的實體介面接頭一定是 RJ-45 嗎？",
-      meaning: "不一定！\n• NIC：絕大多數是 RJ-45（高階有 SFP/光纖）。\n• 傳統 DCE：V.35 / DB-60 / Smart Serial（非 RJ-45）。\n• 專線 CSU/DSU：RJ-48（外觀像 RJ-45 但腳位與屏蔽不同）。\n• 現代 DCE (ONU)：SC/APC 光纖接口 + RJ-45 乙太網孔。",
-      module: "1"
-    },
-
-    // --- Anki 填空題卡片 (Cloze Deletion) ---
-    {
-      term: "每",
-      meaning: "【填空題 1】bit per second (bps) 中的 \"per\" 代表 {{每 / 每一}} 的意思，即每秒傳輸的位元數。",
-      module: "1"
-    },
-    {
-      term: "DCE",
-      meaning: "【填空題 2】在 WAN 架構中，負責提供訊號轉換與 {{時鐘同步 (Clock Rate)}} 的設備稱為 {{DCE}}。",
-      module: "1"
-    },
-    {
-      term: "DTE",
-      meaning: "【填空題 3】廣域網中作為資料起點或終點的設備（如路由器）稱為 {{DTE}}，而內部的網卡模組稱為 {{NIC}}。",
+      term: "Splitter",
+      meaning: "分歧器 / 訊號分離器\n用來分離同一線路上的高頻數據訊號與低頻電話語音訊號的設備。",
       module: "1"
     },
     {
       term: "ONU",
-      meaning: "【填空題 4】現代家中的光纖數據機（{{ONU}}）在架構上扮演的是 {{DCE}} 設備的角色。",
+      meaning: "Optical Network Unit（光纖網路單元）\n俗稱光貓，將光纖光訊號轉換為電訊號，扮演 DCE 設備角色。",
       module: "1"
     },
     {
-      term: "RJ-48",
-      meaning: "【填空題 5】傳統專線 DCE 使用的介面為 {{V.35 / Smart Serial}}，專線 CSU/DSU 使用 {{RJ-48}}，而現代 ONU 光纖介面常為 {{SC/APC}}。",
+      term: "DSU",
+      meaning: "Data Service Unit（資料服務設備）\n在專線（如 T1/E1）中提供數據編碼與時鐘同步的設備。",
       module: "1"
+    },
+    {
+      term: "Shield",
+      meaning: "屏蔽 / 遮蔽\n纜線內部金屬箔或編織網層，用於防止外部電磁干擾 (EMI)。",
+      module: "1"
+    },
+    {
+      term: "UTP",
+      meaning: "Unshielded Twisted Pair（非屏蔽雙絞線）\n無金屬屏蔽層的常見雙絞網線（如 Cat5e, Cat6）。",
+      module: "1"
+    },
+    {
+      term: "STP",
+      meaning: "Shielded Twisted Pair（屏蔽雙絞線）\n具金屬屏蔽層的雙絞線，抗電磁干擾能力強。",
+      module: "1"
+    },
+    {
+      term: "Single-Mode Fiber (SMF)",
+      meaning: "單模光纖 (Single Mode)\n纖芯極細（約 9µm），光線直線傳輸衰減小，適合「長距離」傳輸。",
+      module: "1"
+    },
+    {
+      term: "Multi-Mode Fiber (MMF)",
+      meaning: "多模光纖 (Multi-Mode)\n纖芯較粗（50/62.5µm），光線多角度折射傳輸，適合「短距離」機房傳輸。",
+      module: "1"
+    },
+    {
+      term: "Base (Baseband)",
+      meaning: "基頻傳輸 (Baseband)\n在乙太網命名（如 100BASE-TX）中代表使用數位訊號直接傳送，不進行寬頻載波調變。",
+      module: "1"
+    },
+    {
+      term: "CSMA/CD",
+      meaning: "Carrier Sense Multiple Access with Collision Detection（載波感應多重存取/碰撞偵測）\n半雙工乙太網中用來檢測與處理數據封包碰撞的媒體存取機制。",
+      module: "1"
+    },
+
+    // ==========================================
+    // 獨立類別：Q&A 觀念問答卡 (Module qa)
+    // ==========================================
+    {
+      term: "【卡片 1：單位與術語】bit per second (bps) 中的 \"per\" 是什麼意思？",
+      meaning: "介系詞，意思是「每」或「每一」（相當於斜線 / 或除以）。\nbps 代表每秒傳輸的位元數 (bits/second)。",
+      module: "qa"
+    },
+    {
+      term: "【卡片 2：觀念區分】請簡述廣域網（WAN）架構中 DTE、DCE 與 NIC 的角色差異？",
+      meaning: "• DTE（數據終端設備）：資料起點/終點（如：PC、路由器）。\n• DCE（數據通訊設備）：負責訊號轉換與提供時鐘同步 (Clock Rate)（如：Modem、CSU/DSU）。\n• NIC（網路介面卡）：存在於 DTE 設備內部的實體網卡模組。",
+      module: "qa"
+    },
+    {
+      term: "【卡片 3：現代應用】現代網路中還在使用 DCE 嗎？請舉例說明。",
+      meaning: "有！雖然傳統 Serial DCE 少見，但「DCE 的角色」無所不在。\n例如：家中的 ONU（光纖數據機/光貓）就是 DCE，它接收光訊號、轉換成電訊號，並提供時鐘同步給路由器的 WAN 埠。",
+      module: "qa"
+    },
+    {
+      term: "【卡片 4：CCNA 實作題】在實驗室使用 Serial 背對背纜線連接兩台路由器時，哪一端需要手動設定 clock rate？",
+      meaning: "DCE 端（母頭）。因為 DCE 的核心職責就是提供時鐘訊號同步。",
+      module: "qa"
+    },
+    {
+      term: "【卡片 5：實體介面比較】DCE 與 NIC 的實體介面接頭一定是 RJ-45 嗎？",
+      meaning: "不一定！\n• NIC：絕大多數是 RJ-45（高階有 SFP/光纖）。\n• 傳統 DCE：V.35 / DB-60 / Smart Serial（非 RJ-45）。\n• 專線 CSU/DSU：RJ-48（外觀像 RJ-45 但腳位與屏蔽不同）。\n• 現代 DCE (ONU)：SC/APC 光纖接口 + RJ-45 乙太網孔。",
+      module: "qa"
     }
   ];
 
@@ -352,7 +392,7 @@
     const feedback = document.getElementById('feedback-msg');
     const subEl = document.getElementById('card-sub');
 
-    if (val === ans || ans.includes(val) && val.length > 0) {
+    if (val === ans || (ans.includes(val) && val.length > 0)) {
       feedback.innerText = "✅ 正確！";
       feedback.className = "feedback correct";
       subEl.style.display = 'block';
