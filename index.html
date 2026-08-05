@@ -3,277 +3,322 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CCNA 專業互動單字卡</title>
+  <title>CCNA 英文單字卡</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --card-border: #334155;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --accent: #f59e0b;
-      --danger: #ef4444;
-      --success: #10b981;
+      --bg-color: #f7f8fa;
+      --card-bg: #ffffff;
+      --text-main: #2d3748;
+      --text-sub: #718096;
+      --border-color: #e2e8f0;
+      
+      /* 按鈕顏色 (還原原版風格) */
+      --btn-all: #5b9279;       /* 綠色：全覽 */
+      --btn-flip-dict: #db7070;  /* 紅色：翻牌聽寫 */
+      --btn-kb-dict: #6b90b6;    /* 藍色：鍵盤聽寫 */
+      --btn-ez: #cba36b;         /* 棕黃：閃卡 英中 */
+      --btn-ze: #81b287;         /* 淺綠：閃卡 中英 */
+      --btn-cloze: #b39bc8;      /* 紫色：句子填空 */
+      --btn-toggle: #e8e0d5;     /* 灰褐色：洗牌/星號開關 */
+      --btn-toggle-active: #f59e0b;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      min-height: 100vh;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
+      min-height: 100vh;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 20px;
+    .container {
       width: 100%;
-      max-width: 650px;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    /* 🎛️ 控制面板 */
-    .control-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 16px;
-      width: 100%;
-      max-width: 650px;
-      margin-bottom: 20px;
+      max-width: 480px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
 
-    /* 🔍 搜尋欄位 CSS */
+    h1 {
+      text-align: center;
+      color: #2b6cb0;
+      font-size: 1.6rem;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+
+    /* 頂部資訊卡 (卡片計數與重新整理) */
+    .top-bar {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .card-counter {
+      font-size: 15px;
+      color: var(--text-sub);
+      font-weight: 500;
+    }
+
+    .refresh-btn {
+      background: #319795;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 控制面板與設定選單 */
+    .controls-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .select-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .select-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e0;
+      background: #f8fafc;
+      font-size: 14px;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    /* 🔍 新增：搜尋欄位 */
     .search-box {
       position: relative;
       width: 100%;
     }
 
     .search-box input {
-      width: 100%;
-      padding: 12px 40px 12px 16px;
-      font-size: 15px;
-      background: var(--bg-color);
-      border: 2px solid var(--primary);
-      border-radius: 25px;
-      color: var(--text-main);
-      outline: none;
-      transition: all 0.3s ease;
+      padding-left: 32px;
+      padding-right: 30px;
+      border: 1.5px solid #a0aec0;
+      background-color: #ffffff;
     }
 
     .search-box input:focus {
-      border-color: #60a5fa;
-      box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+      border-color: #3182ce;
+      box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
     }
 
-    .search-box .clear-btn {
+    .search-icon {
       position: absolute;
-      right: 12px;
+      left: 10px;
       top: 50%;
       transform: translateY(-50%);
-      background: transparent;
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
       border: none;
       color: var(--text-sub);
-      font-size: 16px;
+      font-size: 14px;
       cursor: pointer;
       display: none;
     }
 
-    .row {
+    /* 模式選擇按鈕直排 */
+    .mode-buttons {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    select, button, input[type="text"] {
-      background: var(--bg-color);
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    button:hover {
-      border-color: var(--primary);
-      background: #1e293b;
-    }
-
-    .btn-primary {
-      background: var(--primary);
+    .btn-mode {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
       border: none;
-      color: white;
+      font-size: 15px;
       font-weight: bold;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .toggle-btn {
+      color: white;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 14px;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-mode:active {
+      transform: scale(0.99);
+    }
+
+    .btn-all { background-color: var(--btn-all); }
+    .btn-flip-dict { background-color: var(--btn-flip-dict); }
+    .btn-kb-dict { background-color: var(--btn-kb-dict); }
+    .btn-ez { background-color: var(--btn-ez); }
+    .btn-ze { background-color: var(--btn-ze); }
+    .btn-cloze { background-color: var(--btn-cloze); }
+    
+    .btn-toggle { 
+      background-color: var(--btn-toggle); 
+      color: #4a5568; 
+    }
+
+    .btn-toggle.active {
+      background-color: #feebc8;
+      color: #c05621;
+      border: 1px solid #fbd38d;
+    }
+
+    /* 單字卡片區 */
+    .flashcard {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .module-badge {
+      background: #edf2f7;
+      color: #4a5568;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .star-icon {
+      font-size: 24px;
+      color: #cbd5e0;
       cursor: pointer;
       user-select: none;
     }
 
-    /* 🃏 卡片區域 */
-    .card-container {
-      width: 100%;
-      max-width: 650px;
-      perspective: 1000px;
-      min-height: 280px;
-      margin-bottom: 20px;
+    .star-icon.active {
+      color: #ecc94b;
     }
 
-    .flashcard {
-      background: var(--card-bg);
-      border: 2px solid var(--card-border);
-      border-radius: 16px;
-      width: 100%;
-      min-height: 280px;
-      padding: 24px;
+    .card-center {
+      text-align: center;
+      margin: 20px 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.3s, border-color 0.3s;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-    }
-
-    .flashcard:hover {
-      border-color: var(--primary);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      width: 100%;
+      gap: 12px;
     }
 
-    .badge {
-      font-size: 12px;
-      background: #334155;
-      padding: 4px 8px;
-      border-radius: 12px;
-      color: var(--text-sub);
-    }
-
-    .star-btn {
-      background: transparent;
+    .speaker-btn {
+      background: none;
       border: none;
       font-size: 24px;
-      color: var(--text-sub);
       cursor: pointer;
     }
 
-    .star-btn.active {
-      color: var(--accent);
-    }
-
-    .card-body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      flex-grow: 1;
-      margin: 15px 0;
-    }
-
-    .term-text {
+    .card-term {
       font-size: 2rem;
       font-weight: bold;
-      color: var(--text-main);
-      margin-bottom: 10px;
+      color: #1a202c;
     }
 
-    .meaning-text {
+    .card-meaning {
       font-size: 1.1rem;
-      color: #cbd5e1;
+      color: #4a5568;
       line-height: 1.5;
     }
 
-    .audio-btn {
-      background: #334155;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    /* 聽寫/填空輸入區 */
+    .dictation-input {
+      width: 80%;
+      padding: 8px 12px;
+      font-size: 16px;
+      text-align: center;
       margin-top: 10px;
-      cursor: pointer;
     }
 
-    /* 🎮 底部導覽按鈕 */
-    .nav-controls {
+    /* 底部導覽列 */
+    .nav-bar {
       display: flex;
       gap: 12px;
-      width: 100%;
-      max-width: 650px;
-      justify-content: space-between;
-      align-items: center;
+      margin-top: 4px;
     }
 
     .nav-btn {
       flex: 1;
       padding: 12px;
-      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      font-size: 15px;
       font-weight: bold;
-    }
-
-    .progress-text {
-      font-size: 14px;
       color: var(--text-sub);
-      text-align: center;
-      white-space: nowrap;
+      cursor: pointer;
     }
 
-    /* 列表檢視模式 */
-    .list-view {
-      width: 100%;
-      max-width: 650px;
+    /* 全覽列表 */
+    .list-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .list-item {
       background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      border-radius: 10px;
       padding: 12px 16px;
-      border-radius: 8px;
+      border: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -286,136 +331,135 @@
 </head>
 <body>
 
-  <header>
-    <h1>CCNA 專業互動單字庫</h1>
-  </header>
+  <div class="container">
+    <h1>CCNA 英文單字卡</h1>
 
-  <div class="control-panel">
-    <div class="search-box">
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="🔍 搜尋英文單字或中文解釋（輸入 1 個字即可）..." 
-        oninput="handleSearch()"
-      />
-      <button class="clear-btn" id="clearSearchBtn" onclick="clearSearch()">✖</button>
+    <!-- 頂部資訊卡 -->
+    <div class="top-bar">
+      <div class="card-counter">卡片：<span id="cardCountText">1 / --</span></div>
+      <button class="refresh-btn" onclick="fetchData()">🔄 重新整理單字</button>
     </div>
 
-    <div class="row">
-      <select id="moduleSelect" onchange="handleModuleChange()">
-        <option value="all">📚 全部模組 (Module 1~6)</option>
-        <option value="1">模組一：網路基礎與拓撲</option>
-        <option value="2">模組二：IP 位址與子網劃分</option>
-        <option value="3">模組三：路由與交換</option>
-        <option value="4">模組四：網路服務與協定</option>
-        <option value="5">模組五：安全性與存取控制</option>
-        <option value="6">模組六：自動化、管理與除錯</option>
-      </select>
+    <!-- 控制選單與搜尋 -->
+    <div class="controls-card">
+      <div class="select-row">
+        <div class="select-group">
+          口音:
+          <select id="voiceLang">
+            <option value="en-US">美音 US</option>
+            <option value="en-GB">英音 UK</option>
+          </select>
+        </div>
+        <div class="select-group">
+          語速:
+          <select id="voiceRate">
+            <option value="0.75">0.75x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+          </select>
+        </div>
+      </div>
 
-      <select id="modeSelect" onchange="handleModeChange()">
-        <option value="flashcard-ez">🔤 閃卡 (英➔中)</option>
-        <option value="flashcard-ze">🈳 閃卡 (中➔英)</option>
-        <option value="list">📖 全覽清單模式</option>
-      </select>
-    </div>
-
-    <div class="row">
-      <div style="display: flex; gap: 6px; align-items: center;">
-        <select id="voiceLang" style="font-size: 12px;">
-          <option value="en-US">🇺🇸 美式</option>
-          <option value="en-GB">🇬🇧 英式</option>
-        </select>
-        <select id="voiceRate" style="font-size: 12px;">
-          <option value="0.75">0.75x 慢速</option>
-          <option value="1.0" selected>1.0x 正常</option>
-          <option value="1.25">1.25x 快速</option>
+      <div class="select-group">
+        模組:
+        <select id="moduleSelect" onchange="applyFilters()">
+          <option value="all">全部模組 (所有單字)</option>
+          <option value="1">模組 1：網路基礎與拓撲</option>
+          <option value="2">模組 2：IP 位址與子網劃分</option>
+          <option value="3">模組 3：路由與交換</option>
+          <option value="4">模組 4：網路服務與協定</option>
+          <option value="5">模組 5：安全性與存取控制</option>
+          <option value="6">模組 6：自動化、管理與除錯</option>
         </select>
       </div>
 
-      <label class="toggle-btn">
-        <input type="checkbox" id="shuffleToggle" onchange="handleShuffleToggle()" /> 🔀 隨機洗牌
-      </label>
-
-      <label class="toggle-btn">
-        <input type="checkbox" id="starredToggle" onchange="handleStarredToggle()" /> ★ 只看收藏
-      </label>
-    </div>
-
-    <div class="row" style="margin-top: 5px;">
-      <button onclick="syncGoogleSheets()" style="width: 100%; font-size: 12px; color: var(--text-sub);">
-        🔄 雲端數據同步 (Google 試算表)
-      </button>
-    </div>
-  </div>
-
-  <div class="card-container" id="cardContainer">
-    <div class="flashcard" onclick="flipCard()">
-      <div class="card-header">
-        <span class="badge" id="cardModuleBadge">Module 1</span>
-        <button class="star-btn" id="starBtn" onclick="toggleStar(event)">★</button>
+      <!-- 🔍 新增：搜尋欄位 (英中標頭皆可尋找) -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="搜尋英文單字或中文解釋..." 
+          oninput="handleSearch()"
+        />
+        <button class="clear-search-btn" id="clearSearchBtn" onclick="clearSearch()">✖</button>
       </div>
-      <div class="card-body">
-        <div class="term-text" id="cardMainText">Bandwidth</div>
-        <div class="meaning-text hidden" id="cardSubText">頻寬：網路鏈路最大可傳輸資料的容量。</div>
-        <button class="audio-btn" id="audioBtn" onclick="speakCurrent(event)">🔊</button>
+    </div>
+
+    <!-- 功能模式按鈕 (還原原始排版與顏色) -->
+    <div class="mode-buttons">
+      <button class="btn-mode btn-all" onclick="setMode('list')">📖 全覽</button>
+      <button class="btn-mode btn-flip-dict" onclick="setMode('flip-dict')">👀 翻牌聽寫</button>
+      <button class="btn-mode btn-kb-dict" onclick="setMode('kb-dict')">⌨️ 鍵盤聽寫</button>
+      <button class="btn-mode btn-ez" onclick="setMode('flashcard-ez')">🔤 閃卡 (英中)</button>
+      <button class="btn-mode btn-ze" onclick="setMode('flashcard-ze')">🈳 閃卡 (中英)</button>
+      <button class="btn-mode btn-cloze" onclick="setMode('cloze')">✍️ 句子填空</button>
+      <button class="btn-mode btn-toggle" id="btnShuffle" onclick="toggleShuffle()">🔀 隨機洗牌：關閉</button>
+      <button class="btn-mode btn-toggle" id="btnStarred" onclick="toggleStarred()">⭐ 只複習星號：關閉</button>
+    </div>
+
+    <!-- 主卡片區域 -->
+    <div id="flashcardArea" class="flashcard" onclick="handleCardClick()">
+      <div class="card-top">
+        <span class="module-badge" id="moduleBadge">模組 1</span>
+        <span class="star-icon" id="starIcon" onclick="toggleStar(event)">★</span>
+      </div>
+      <div class="card-center">
+        <button class="speaker-btn" onclick="speakCurrent(event)">🔊</button>
+        <div class="card-term" id="cardTerm">Bandwidth</div>
+        <div class="card-meaning hidden" id="cardMeaning">頻寬</div>
+        <input type="text" id="dictInput" class="dictation-input hidden" placeholder="請輸入英文單字..." onkeyup="checkAnswer(event)">
       </div>
       <div style="text-align: center; font-size: 12px; color: var(--text-sub);">
-        💡 點擊卡片任意處切換顯示/隱藏
+        <span id="cardTip">💡 點擊卡片顯示/隱藏解答</span>
       </div>
     </div>
-  </div>
 
-  <div class="list-view hidden" id="listView"></div>
+    <!-- 全覽清單區域 -->
+    <div id="listArea" class="list-container hidden"></div>
 
-  <div class="nav-controls" id="navControls">
-    <button class="nav-btn" onclick="prevCard()">◄ 上一張</button>
-    <span class="progress-text" id="progressText">0 / 0</span>
-    <button class="nav-btn btn-primary" onclick="nextCard()">下一張 ►</button>
+    <!-- 底部導覽頁 -->
+    <div id="navBar" class="nav-bar">
+      <button class="nav-btn" onclick="prevCard()">上一張</button>
+      <button class="nav-btn" onclick="nextCard()">下一張</button>
+    </div>
   </div>
 
   <script>
-    // 預設 Google 試算表 CSV 連結 (可自動讀取)
     const DEFAULT_CSV_URL = "https://docs.google.com/spreadsheets/d/11TPk1y13fu6YPRX5Ai0zTHIaaD1ZPoz1MXW9oj18ow0/export?format=csv";
 
-    // 內建備用單字庫 (當網路中斷或試算表無法讀取時自動備援)
     const fallbackCards = [
-      { id: 1, term: "Bandwidth", meaning: "頻寬：網路鏈路最大可傳輸資料的容量（如 1 Gbps）。", module: 1 },
+      { id: 1, term: "Bandwidth", meaning: "頻寬：網路鏈路最大可傳輸資料容量。", module: 1 },
       { id: 2, term: "Throughput", meaning: "吞吐量：單位時間內實際成功傳送的資料量。", module: 1 },
-      { id: 3, term: "Latency", meaning: "延遲：封包從來源端到達目的地所需的時間。", module: 1 },
-      { id: 4, term: "TCP Sequencing", meaning: "TCP 順序控制：將資料切塊並編號重組的機制。", module: 4 },
-      { id: 5, term: "Handshake", meaning: "握手：TCP 建立連線的三向握手機制 (SYN, SYN-ACK, ACK)。", module: 4 },
-      { id: 6, term: "Spanning Tree Protocol (STP)", meaning: "生成樹協定：防止二層交換網路產生迴路 (Loop)。", module: 3 },
-      { id: 7, term: "Authentication", meaning: "身份驗證：確認使用者或設備身份的真實性 (AAA 第一個 A)。", module: 5 }
+      { id: 3, term: "Latency", meaning: "延遲：封包傳輸所需的時間。", module: 1 },
+      { id: 4, term: "TCP Sequencing", meaning: "TCP 順序控制：將資料切塊編號並重組。", module: 4 },
+      { id: 5, term: "Handshake", meaning: "握手：TCP 三向握手機制 (SYN, SYN-ACK, ACK)。", module: 4 }
     ];
 
     let rawCards = [];
     let filteredCards = [];
     let currentIndex = 0;
+    let currentMode = 'flashcard-ez'; // 預設英中閃卡
     let isFlipped = false;
-    let starredIds = new Set(JSON.parse(localStorage.getItem('ccna_starred_cards') || '[]'));
+    let isShuffle = false;
+    let isStarredOnly = false;
     let searchKeyword = "";
+    let starredIds = new Set(JSON.parse(localStorage.getItem('ccna_starred_cards') || '[]'));
 
-    // 🚀 初始化載入
     window.onload = function() {
-      fetchSheetData();
+      fetchData();
     };
 
-    // 📥 讀取 Google 試算表 CSV 資料
-    function fetchSheetData() {
-      const csvUrl = localStorage.getItem('ccna_csv_url') || DEFAULT_CSV_URL;
-      fetch(csvUrl)
+    function fetchData() {
+      fetch(DEFAULT_CSV_URL)
         .then(res => res.text())
-        .then(csvText => {
-          parseCSV(csvText);
-        })
-        .catch(err => {
-          console.warn("無法讀取雲端試算表，改用備用資料庫", err);
+        .then(csv => parseCSV(csv))
+        .catch(() => {
           rawCards = fallbackCards;
           applyFilters();
         });
     }
 
-    // 📊 解析 CSV 格式
     function parseCSV(text) {
       const lines = text.split('\n');
       const cards = [];
@@ -436,23 +480,19 @@
       applyFilters();
     }
 
-    // 🔍 搜尋與過濾核心邏輯
+    // 🔍 搜尋與資料過濾
     function applyFilters() {
-      const selectedModule = document.getElementById('moduleSelect').value;
-      const starredOnly = document.getElementById('starredToggle').checked;
-      const isShuffle = document.getElementById('shuffleToggle').checked;
-
-      // 1. 模組過濾
-      let list = selectedModule === 'all' 
+      const moduleVal = document.getElementById('moduleSelect').value;
+      
+      let list = moduleVal === 'all' 
         ? [...rawCards] 
-        : rawCards.filter(c => c.module == selectedModule);
+        : rawCards.filter(c => c.module == moduleVal);
 
-      // 2. 星號過濾
-      if (starredOnly) {
+      if (isStarredOnly) {
         list = list.filter(c => starredIds.has(c.term));
       }
 
-      // 3. 🔍 關鍵字搜尋過濾 (英中雙向)
+      // 🔍 搜尋關鍵字過濾（打 1 個字即可查搜尋英中）
       if (searchKeyword) {
         list = list.filter(c => 
           (c.term && c.term.toLowerCase().includes(searchKeyword)) ||
@@ -460,7 +500,6 @@
         );
       }
 
-      // 4. 隨機洗牌
       if (isShuffle) {
         list.sort(() => Math.random() - 0.5);
       }
@@ -468,10 +507,9 @@
       filteredCards = list;
       currentIndex = 0;
       isFlipped = false;
-      updateDisplay();
+      render();
     }
 
-    // 🔍 搜尋輸入監聽
     function handleSearch() {
       const input = document.getElementById('searchInput');
       searchKeyword = input.value.trim().toLowerCase();
@@ -479,143 +517,165 @@
       applyFilters();
     }
 
-    // ✖ 清空搜尋欄
     function clearSearch() {
       document.getElementById('searchInput').value = '';
       handleSearch();
     }
 
-    // 🖥️ 更新畫面顯示
-    function updateDisplay() {
-      const mode = document.getElementById('modeSelect').value;
-      const cardContainer = document.getElementById('cardContainer');
-      const listView = document.getElementById('listView');
-      const navControls = document.getElementById('navControls');
-
-      if (filteredCards.length === 0) {
-        document.getElementById('cardMainText').innerText = "🔍 找不到相符的單字";
-        document.getElementById('cardSubText').innerText = "請嘗試搜尋其他關鍵字或切換模組。";
-        document.getElementById('cardSubText').classList.remove('hidden');
-        document.getElementById('progressText').innerText = "0 / 0";
-        return;
-      }
-
-      if (mode === 'list') {
-        cardContainer.classList.add('hidden');
-        navControls.classList.add('hidden');
-        listView.classList.remove('hidden');
-        renderListView();
-        return;
-      }
-
-      cardContainer.classList.remove('hidden');
-      navControls.classList.remove('hidden');
-      listView.classList.add('hidden');
-
-      const card = filteredCards[currentIndex];
-      document.getElementById('cardModuleBadge').innerText = `Module ${card.module}`;
-      
-      const starBtn = document.getElementById('starBtn');
-      if (starredIds.has(card.term)) {
-        starBtn.classList.add('active');
-      } else {
-        starBtn.classList.remove('active');
-      }
-
-      // 閃卡模式切換
-      if (mode === 'flashcard-ez') { // 英 ➔ 中
-        document.getElementById('cardMainText').innerText = card.term;
-        document.getElementById('cardSubText').innerText = card.meaning;
-      } else { // 中 ➔ 英
-        document.getElementById('cardMainText').innerText = card.meaning;
-        document.getElementById('cardSubText').innerText = card.term;
-      }
-
-      if (isFlipped) {
-        document.getElementById('cardSubText').classList.remove('hidden');
-      } else {
-        document.getElementById('cardSubText').classList.add('hidden');
-      }
-
-      document.getElementById('progressText').innerText = `${currentIndex + 1} / ${filteredCards.length}`;
+    function setMode(mode) {
+      currentMode = mode;
+      isFlipped = false;
+      render();
     }
 
-    // 📖 渲染全覽清單
-    function renderListView() {
-      const listView = document.getElementById('listView');
-      listView.innerHTML = filteredCards.map(card => `
+    function toggleShuffle() {
+      isShuffle = !isShuffle;
+      const btn = document.getElementById('btnShuffle');
+      btn.innerText = `🔀 隨機洗牌：${isShuffle ? '開啟' : '關閉'}`;
+      btn.classList.toggle('active', isShuffle);
+      applyFilters();
+    }
+
+    function toggleStarred() {
+      isStarredOnly = !isStarredOnly;
+      const btn = document.getElementById('btnStarred');
+      btn.innerText = `⭐ 只複習星號：${isStarredOnly ? '開啟' : '關閉'}`;
+      btn.classList.toggle('active', isStarredOnly);
+      applyFilters();
+    }
+
+    function render() {
+      const flashcardArea = document.getElementById('flashcardArea');
+      const listArea = document.getElementById('listArea');
+      const navBar = document.getElementById('navBar');
+      const countText = document.getElementById('cardCountText');
+
+      if (filteredCards.length === 0) {
+        countText.innerText = `0 / 0`;
+        flashcardArea.classList.remove('hidden');
+        listArea.classList.add('hidden');
+        document.getElementById('cardTerm').innerText = "🔍 無相關卡片";
+        document.getElementById('cardMeaning').innerText = "請試著輸入其他關鍵字或切換模組";
+        document.getElementById('cardMeaning').classList.remove('hidden');
+        document.getElementById('dictInput').classList.add('hidden');
+        return;
+      }
+
+      countText.innerText = `${currentIndex + 1} / ${filteredCards.length}`;
+
+      if (currentMode === 'list') {
+        flashcardArea.classList.add('hidden');
+        navBar.classList.add('hidden');
+        listArea.classList.remove('hidden');
+        renderList();
+        return;
+      }
+
+      flashcardArea.classList.remove('hidden');
+      navBar.classList.remove('hidden');
+      listArea.classList.add('hidden');
+
+      const card = filteredCards[currentIndex];
+      document.getElementById('moduleBadge').innerText = `模組 ${card.module}`;
+      
+      const starIcon = document.getElementById('starIcon');
+      starIcon.classList.toggle('active', starredIds.has(card.term));
+
+      const termEl = document.getElementById('cardTerm');
+      const meaningEl = document.getElementById('cardMeaning');
+      const dictInput = document.getElementById('dictInput');
+
+      dictInput.classList.add('hidden');
+
+      if (currentMode === 'flashcard-ez') { // 英 ➔ 中
+        termEl.innerText = card.term;
+        meaningEl.innerText = card.meaning;
+        meaningEl.classList.toggle('hidden', !isFlipped);
+      } else if (currentMode === 'flashcard-ze') { // 中 ➔ 英
+        termEl.innerText = card.meaning;
+        meaningEl.innerText = card.term;
+        meaningEl.classList.toggle('hidden', !isFlipped);
+      } else if (currentMode === 'flip-dict' || currentMode === 'kb-dict') {
+        termEl.innerText = card.meaning;
+        meaningEl.innerText = card.term;
+        meaningEl.classList.toggle('hidden', !isFlipped);
+        if (currentMode === 'kb-dict') {
+          dictInput.classList.remove('hidden');
+          dictInput.value = '';
+        }
+      } else if (currentMode === 'cloze') {
+        termEl.innerText = card.meaning.replace(/[\u4e00-\u9fa5]+/g, '____');
+        meaningEl.innerText = card.term;
+        meaningEl.classList.toggle('hidden', !isFlipped);
+      }
+    }
+
+    function renderList() {
+      const listArea = document.getElementById('listArea');
+      listArea.innerHTML = filteredCards.map(c => `
         <div class="list-item">
           <div>
-            <strong style="color: var(--primary); font-size: 16px;">${card.term}</strong>
-            <p style="color: var(--text-sub); font-size: 14px; margin-top: 4px;">${card.meaning}</p>
+            <strong style="color: #2b6cb0;">${c.term}</strong>
+            <div style="font-size: 13px; color: #4a5568; margin-top:2px;">${c.meaning}</div>
           </div>
-          <button class="star-btn ${starredIds.has(card.term) ? 'active' : ''}" onclick="toggleStarByTerm('${card.term}')">★</button>
+          <span class="star-icon ${starredIds.has(c.term) ? 'active' : ''}" onclick="toggleStarByTerm('${c.term}')">★</span>
         </div>
       `).join('');
     }
 
-    // 🔄 切換翻面
-    function flipCard() {
+    function handleCardClick() {
+      if (currentMode === 'kb-dict') return;
       isFlipped = !isFlipped;
-      updateDisplay();
+      render();
     }
 
-    // ◄ 上一張 / 下一張 ►
     function nextCard() {
       if (filteredCards.length === 0) return;
       currentIndex = (currentIndex + 1) % filteredCards.length;
       isFlipped = false;
-      updateDisplay();
+      render();
     }
 
     function prevCard() {
       if (filteredCards.length === 0) return;
       currentIndex = (currentIndex - 1 + filteredCards.length) % filteredCards.length;
       isFlipped = false;
-      updateDisplay();
+      render();
     }
 
-    // ★ 收藏切換
     function toggleStar(e) {
       e.stopPropagation();
       if (filteredCards.length === 0) return;
-      const term = filteredCards[currentIndex].term;
-      toggleStarByTerm(term);
+      toggleStarByTerm(filteredCards[currentIndex].term);
     }
 
     function toggleStarByTerm(term) {
-      if (starredIds.has(term)) {
-        starredIds.delete(term);
-      } else {
-        starredIds.add(term);
-      }
+      if (starredIds.has(term)) starredIds.delete(term);
+      else starredIds.add(term);
       localStorage.setItem('ccna_starred_cards', JSON.stringify([...starredIds]));
-      updateDisplay();
+      render();
     }
 
-    // 🔊 語音發音 (TTS)
     function speakCurrent(e) {
       if (e) e.stopPropagation();
       if (filteredCards.length === 0) return;
       const card = filteredCards[currentIndex];
-      const utterance = new SpeechSynthesisUtterance(card.term);
-      utterance.lang = document.getElementById('voiceLang').value;
-      utterance.rate = parseFloat(document.getElementById('voiceRate').value);
-      window.speechSynthesis.speak(utterance);
+      const u = new SpeechSynthesisUtterance(card.term);
+      u.lang = document.getElementById('voiceLang').value;
+      u.rate = parseFloat(document.getElementById('voiceRate').value);
+      window.speechSynthesis.speak(u);
     }
 
-    // 🎛️ 選單事件處理
-    function handleModuleChange() { applyFilters(); }
-    function handleModeChange() { updateDisplay(); }
-    function handleShuffleToggle() { applyFilters(); }
-    function handleStarredToggle() { applyFilters(); }
-
-    // 🔗 手動設定試算表網址
-    function syncGoogleSheets() {
-      const url = prompt("請貼上您的 Google 試算表 CSV 連結：", localStorage.getItem('ccna_csv_url') || DEFAULT_CSV_URL);
-      if (url) {
-        localStorage.setItem('ccna_csv_url', url.trim());
-        fetchSheetData();
+    function checkAnswer(e) {
+      if (e.key === 'Enter') {
+        const val = e.target.value.trim().toLowerCase();
+        const ans = filteredCards[currentIndex].term.toLowerCase();
+        if (val === ans) {
+          alert("🎉 答對了！");
+          nextCard();
+        } else {
+          alert(`❌ 答錯囉，正確答案是：${filteredCards[currentIndex].term}`);
+        }
       }
     }
   </script>
